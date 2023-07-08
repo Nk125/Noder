@@ -94,7 +94,7 @@ private:
 		}
 
 		nlohmann::json config = {
-			{RequestSender::UserAgent, useragent}
+			{std::to_string(RequestSender::UserAgent), useragent}
 		};
 
 		switch (type) {
@@ -126,8 +126,8 @@ private:
 				}
 				else contenttype = j.at("contenttype");
 
-				config[RequestSender::ContentType] = contenttype;
-				config[RequestSender::Body] = body;
+				config[std::to_string(RequestSender::ContentType)] = contenttype;
+				config[std::to_string(RequestSender::Body)] = body;
 
 				Threading::id++;
 
