@@ -40,7 +40,7 @@ void start() {
 }
 
 int main() {
-	Threading::id = 0;
+	RequestSender::stopThreads = false;
 	Configuration::loadConfig();
 
 	while (true) {

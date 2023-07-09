@@ -1,2 +1,2 @@
 #pragma once
-#define CONFIG_FILE "nodeconfig.json"
+#define CONFIG_FILE "./nodeconfig.json"

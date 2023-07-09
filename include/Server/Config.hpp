@@ -12,9 +12,15 @@ namespace Configuration {
         };
 
 	    try {
-		    std::ifstream f(CONFIG_FILE);
-		    config = nlohmann::json::parse(f);
-		    f.close();
+			std::ifstream f(CONFIG_FILE, std::ios::binary);
+
+			if (f.is_open()) {
+				config = nlohmann::json::parse(f);
+				f.close();
+			}
+			else {
+				throw std::exception();
+			}
 	    }
 	    catch (...) {
 		    std::cerr << "Failed loading config, using default values\n";

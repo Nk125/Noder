@@ -2,6 +2,7 @@
 #include <httplib.h>
 #include <iostream>
 #include <map>
+#include <mutex>
 
 void usage() {
     std::cout << R"""(
@@ -27,9 +28,12 @@ int main(int argc, char* argv[]) {
     httplib::Server sv;
 
     std::map<std::string, std::atomic<unsigned long long>> requests = {};
+    std::mutex m;
 
     sv.set_logger([&](const httplib::Request& req, const httplib::Response& res) {
+        m.lock();
         std::cout << "\rRequest #" << (++requests.try_emplace({req.method, 0}).first->second);
+        m.unlock();
     });
 
     sv.Get("/", [&](const httplib::Request& req, httplib::Response& res) {

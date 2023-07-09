@@ -98,48 +98,52 @@ private:
 		};
 
 		switch (type) {
-			case GET:
-			{
-				Threading::id++;
+		case GET:
+		{
+			Threading::id++;
 
-				std::cout << "New requester: GET to " << url << " id: " << Threading::id << "\n";
+			std::cout << "New requester: GET to " << url << " id: " << Threading::id << "\n";
 
-				Threading::threader->push_task(RequestSender::getHTTPRequest, url, config);
+			RequestSender::stopThreads = false;
 
-				genericResponse(res, "Ok, initialized GET requester");
+			Threading::threader->push_task(RequestSender::getHTTPRequest, url, config);
+
+			genericResponse(res, "Ok, initialized GET requester");
+			return;
+		}
+		break;
+		case POST:
+		{
+			std::string body, contenttype;
+
+			if (!j.at("body").is_string()) {
+				genericError(res, "Body param isn't a valid value", Error::InvalidBody);
 				return;
 			}
-			break;
-			case POST:
-			{
-				std::string body, contenttype;
+			else body = j.at("body");
 
-				if (!j.at("body").is_string()) {
-					genericError(res, "Body param isn't a valid value", Error::InvalidBody);
-					return;
-				}
-				else body = j.at("body");
-
-				if (!j.at("contenttype").is_string()) {
-					genericError(res, "Content Type param isn't a valid value", Error::InvalidBody);
-					return;
-				}
-				else contenttype = j.at("contenttype");
-
-				config[std::to_string(RequestSender::ContentType)] = contenttype;
-				config[std::to_string(RequestSender::Body)] = body;
-
-				Threading::id++;
-
-				std::cout << "New requester: POST to " << url << " id: " << Threading::id << " body: " << body << "\n";
-
-				Threading::threader->push_task(RequestSender::postHTTPRequest, url, config);
-
-				genericResponse(res, "Ok, initialized POST requester");
+			if (!j.at("contenttype").is_string()) {
+				genericError(res, "Content Type param isn't a valid value", Error::InvalidBody);
 				return;
 			}
-			break;
-			default:
+			else contenttype = j.at("contenttype");
+
+			config[std::to_string(RequestSender::ContentType)] = contenttype;
+			config[std::to_string(RequestSender::Body)] = body;
+
+			Threading::id++;
+
+			std::cout << "New requester: POST to " << url << " id: " << Threading::id << " body: " << body << "\n";
+
+			RequestSender::stopThreads = false;
+
+			Threading::threader->push_task(RequestSender::postHTTPRequest, url, config);
+
+			genericResponse(res, "Ok, initialized POST requester");
+			return;
+		}
+		break;
+		default:
 			genericError(res, "Not implemented yet", Error::NotImplemented, 501);
 			return;
 			break;
@@ -148,7 +152,7 @@ private:
 
 	static std::string getIP() {
 		httplib::Client c("https://api.ipify.org");
-    	auto r = c.Get("/");
+		auto r = c.Get("/");
 		return (r ? r->body : "0.0.0.0");
 	}
 
@@ -158,45 +162,45 @@ public:
 			if (!checkAuthorization(req, res)) return;
 
 			genericError(res, "Invalid Method", InvalidMethod);
-		});
+			});
 
 		sv.Get("/get", [](const httplib::Request& req, httplib::Response& res) {
 			if (!checkAuthorization(req, res)) return;
-			
+
 			genericError(res, "Invalid Method", InvalidMethod);
-		});
+			});
 
 		sv.Post("/get", [](const httplib::Request& req, httplib::Response& res) {
 			if (!checkAuthorization(req, res)) return;
-			
+
 			requestResponse(req, res, GET);
-		});
+			});
 
 		sv.Post("/post", [](const httplib::Request& req, httplib::Response& res) {
 			if (!checkAuthorization(req, res)) return;
-			
+
 			requestResponse(req, res, POST);
-		});
+			});
 
 		sv.Get("/server/check", [](const httplib::Request& req, httplib::Response& res) {
 			if (!checkAuthorization(req, res)) return;
-			
+
 			genericResponse(res, "Online");
-		});
+			});
 
 		sv.Get("/server/ip", [](const httplib::Request& req, httplib::Response& res) {
 			if (!checkAuthorization(req, res)) return;
 
 			genericResponse(res, getIP());
-		});
+			});
 
 		sv.Get("/server/uptime", [](const httplib::Request& req, httplib::Response& res) {
 			if (!checkAuthorization(req, res)) return;
-			
+
 			Time::timePoint moment = Time::now();
 
 			genericResponse(res, std::to_string(Time::diff(moment, Time::timer).count()));
-		});
+			});
 
 		sv.Get("/server/config/reload", [](const httplib::Request& req, httplib::Response& res) {
 			if (!checkAuthorization(req, res)) return;
@@ -204,19 +208,21 @@ public:
 			genericResponse(res, "Reloading config");
 
 			Configuration::loadConfig();
-		});
+			});
 
 		sv.Get("/server/restart", [&](const httplib::Request& req, httplib::Response& res) {
 			if (!checkAuthorization(req, res)) return;
 
 			genericResponse(res, "Restarting...");
 
+			RequestSender::stopThreads = true;
+			Threading::threader->purge();
 			sv.stop();
-		});
+			});
 
 		sv.Get("/", [](const httplib::Request& req, httplib::Response& res) {
 			res.status = 200;
 			res.set_content("Hi!", "text/plain");
-		});
+			});
 	}
 };
