@@ -1,5 +1,8 @@
 Node/build
 Node/buildvs
+Controller/build
+Controller/buildvs
+build
 .vs/
 .vscode/
 .replit

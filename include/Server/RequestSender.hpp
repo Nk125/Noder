@@ -73,7 +73,11 @@ public:
 		std::string finalurl = (u.protocol_.empty() ? "http" : u.protocol_) + "://" + u.host_, finalpath = (u.path_.empty() ? "/" : u.path_) + (u.query_.empty() ? "" : "?" + u.query_);
 
 		while (!stopThreads) {
+			#if USE_THREADING_IN_REQUESTS
 			Threading::threader->push_task(RequestSender::request, finalurl, finalpath, h, false, "", "");
+			#else
+			RequestSender::request(finalurl, finalpath, h);
+			#endif
 		}
 	}
 
@@ -93,7 +97,11 @@ public:
 
 		while (!stopThreads) {
 			regenBody(body, u.body_);
+			#if USE_THREADING_IN_REQUESTS
 			Threading::threader->push_task(RequestSender::request, finalurl, finalpath, h, true, body, u.ctype_);
+			#else
+			RequestSender::request(finalurl, finalpath, h, true, body, u.ctype_);
+			#endif
 		}
 	}
 };

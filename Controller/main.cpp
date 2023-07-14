@@ -1,4 +1,3 @@
-#include <iostream>
 #include <Controller/Nodes.hpp>
 #include <Controller/User.hpp>
 
@@ -22,7 +21,11 @@ int main() {
         nodes.Remove();
     });
 
-    user.RegisterFunction("Import nodes", "Import nodes from a list in a file, nodes should be separated by a newline", [&]() {
+    user.RegisterFunction("Clear nodes", "Remove ALL nodes from the node list", [&]() {
+        nodes.RemoveAll();
+    });
+
+    user.RegisterFunction("Import nodes", "Import nodes from a list in a file", [&]() {
         nodes.Import();
     });
 
@@ -36,6 +39,14 @@ int main() {
 
     user.RegisterFunction("Check nodes", "Check all nodes, their uptime, etc.", [&]() {
         nodes.Check();
+    });
+
+    user.RegisterFunction("Reload config", "Reloads the config of all nodes", [&]() {
+        nodes.Reload();
+    });
+
+    user.RegisterFunction("Single reload config", "Reloads the config of just one node", [&]() {
+        nodes.SingleReload();
     });
 
     user.RegisterFunction("GET DDoS", "Sets up massive GET requester", [&]() {

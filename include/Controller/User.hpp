@@ -3,7 +3,7 @@
 #include <functional>
 #include <iostream>
 #include <iterator>
-#include <rang.hpp>
+#include <Controller/rang.hpp>
 #include <string>
 #include <vector>
 
@@ -25,6 +25,17 @@ private:
 			std::cout << "\n\n";
 
 			try {
+				if (std::cin.fail()) {
+					std::cin.clear();
+					std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+					
+					throw std::exception();
+
+					continue;
+				}
+
+				std::cin.ignore();
+
 				functions.at(opt).Executor();
 			}
 			catch (...) {
@@ -87,6 +98,10 @@ public:
 			<< "]" << ": " << content << "\n";
 	}
 
+	static void Warn(std::string content) {
+		Notify(content, "Warning");
+	}
+
 	static void Error(std::string description, std::string mod = "Unknown", bool fatal = false) {
 		std::cerr << "\n[" << rang::fgB::red << ("Error") << rang::fg::reset << " (" 
 			<< rang::fgB::yellow << mod << rang::fg::reset << ")]" 
@@ -95,10 +110,12 @@ public:
 		if (fatal) std::exit(1);
 	}
 
-	template <typename T>
-	static void Request(T& user_input, std::string msg) {
+	static bool Request(std::string& user_input, std::string msg) {
 		std::cout << msg << ": ";
-		std::cin >> user_input;
+		std::getline(std::cin, user_input);
+	
 		std::cout << "\n";
+		
+		return (user_input != "cancel");
 	}
 };
