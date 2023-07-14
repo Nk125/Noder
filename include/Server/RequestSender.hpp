@@ -74,7 +74,12 @@ public:
 
 		while (!stopThreads) {
 			#if USE_THREADING_IN_REQUESTS
-            		std::thread(RequestSender::request, finalurl, finalpath, h, false, "", "").detach();
+            try {
+                std::thread(RequestSender::request, finalurl, finalpath, h, false, "", "").detach();
+            }
+            catch (...) {
+                continue;
+            }
 			#else
 			RequestSender::request(finalurl, finalpath, h);
 			#endif
@@ -98,7 +103,12 @@ public:
 		while (!stopThreads) {
 			regenBody(body, u.body_);
 			#if USE_THREADING_IN_REQUESTS
-            		std::thread(RequestSender::request, finalurl, finalpath, h, true, body, u.ctype_).detach();
+            try {
+                std::thread(RequestSender::request, finalurl, finalpath, h, true, body, u.ctype_).detach();
+            }
+            catch (...) {
+                continue;
+            }
 			#else
 			RequestSender::request(finalurl, finalpath, h, true, body, u.ctype_);
 			#endif
