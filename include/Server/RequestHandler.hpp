@@ -3,8 +3,12 @@
 #include <json.hpp>
 #include <Server/Config.hpp>
 #include <Server/RequestSender.hpp>
-#include <Server/Threading.hpp>
 #include <Server/Time.hpp>
+#if USE_THREAD_POOL
+#include <Server/Threading.hpp>
+#else
+#include <thread>
+#endif
 
 class RequestHandler {
 private:
@@ -13,7 +17,8 @@ private:
 		NotImplemented,
 		EmptyBody,
 		InvalidBody,
-		InvalidMethod
+		InvalidMethod,
+		Thread
 	};
 
 	enum {
@@ -105,8 +110,18 @@ private:
 			std::cout << "New requester: GET to " << url << " id: " << Threading::id << "\n";
 
 			RequestSender::stopThreads = false;
-
+			
+			#if USE_THREAD_POOL
 			Threading::threader->push_task(RequestSender::getHTTPRequest, url, config);
+			#else
+			try {
+				std::thread(RequestSender::getHTTPRequest, url, config).detach();
+			}
+			catch (...) {
+				genericError(res, "Failed to detach thread", Error::Thread, 500);
+				return;
+			}
+			#endif
 
 			genericResponse(res, "Ok, initialized GET requester");
 			return;
@@ -137,7 +152,17 @@ private:
 
 			RequestSender::stopThreads = false;
 
-			Threading::threader->push_task(RequestSender::postHTTPRequest, url, config);
+			#if USE_THREAD_POOL
+			Threading::threader->push_task();
+			#else
+			try {
+				std::thread(RequestSender::postHTTPRequest, url, config).detach();
+			}
+			catch (...) {
+				genericError(res, "Failed to detach thread", Error::Thread, 500);
+				return;
+			}
+			#endif
 
 			genericResponse(res, "Ok, initialized POST requester");
 			return;
