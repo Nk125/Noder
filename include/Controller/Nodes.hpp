@@ -40,6 +40,25 @@ private:
 
     std::vector<Node> nodes;
 
+    bool easyNodeAuth(size_t id) {
+        Node node;
+
+            try {
+                if (!getNodeFromID(node, nid)) {
+                    return false;
+                }
+
+                internalAuthorize(node, token);
+
+                return true;
+            }
+            catch (...) {
+                return false;
+            }
+
+        return false;
+    }
+
     void internalAuthorize(Node& node, std::string token) {
         std::string nurl = node.url, modname = "Internal Authorization";
         
@@ -88,40 +107,13 @@ public:
 
         if (!User::Request(token, "Insert the token for all nodes")) return;
         
-        for (size_t nid = 0; nid < nodes.size(); nid++) {
-            Node node;
-
-            try {
-                if (!getNodeFromID(node, nid)) {
-                    throw std::exception();
-                }
-
-                internalAuthorize(node, token);
-
+        for (size_t nid = 1; nid < nodes.size(); nid++) {
+            if (!easyNodeAuth(nid - 1)) {
+                User::Error("Node #" + std::to_string(nid) + " wasn't authorized", modname);
             }
-            catch (std::runtime_error& e) {
-                switch (std::stoi(e.what())) {
-                case Unauthorized:
-                    User::Error("Token wasn't authorized on node " + std::to_string(nid), modname);
-                    return;
-                    break;
-                case EmptyURL:
-                    User::Error("# " + std::to_string(nid) + "Node url is empty", modname);
-                    return;
-                    break;
-                default:
-                    break;
-                }
-
-                throw std::exception();
-                return;
+            else {
+                User::Notify("Node #" + std::to_string(nid) + " authorized!", modname);
             }
-            catch (...) {
-                User::Error("Unknown error authenticating token on node " + std::to_string(nid), modname);
-                continue;
-            }
-
-            User::Notify("Token succesfully authorized on node " + std::to_string(nid), modname);
         }
 
         return;
