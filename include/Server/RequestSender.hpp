@@ -3,7 +3,7 @@
 #include <parser.hpp>
 #include <json.hpp>
 #include <regex>
-#include <Server/Threading.hpp>
+#include <thread>
 
 class RequestSender {
 private:
@@ -74,7 +74,12 @@ public:
 
 		while (!stopThreads) {
 			#if USE_THREADING_IN_REQUESTS
-			Threading::threader->push_task(RequestSender::request, finalurl, finalpath, h, false, "", "");
+            try {
+                std::thread(RequestSender::request, finalurl, finalpath, h, false, "", "").detach();
+            }
+            catch (...) {
+                continue;
+            }
 			#else
 			RequestSender::request(finalurl, finalpath, h);
 			#endif
@@ -98,7 +103,12 @@ public:
 		while (!stopThreads) {
 			regenBody(body, u.body_);
 			#if USE_THREADING_IN_REQUESTS
-			Threading::threader->push_task(RequestSender::request, finalurl, finalpath, h, true, body, u.ctype_);
+            try {
+                std::thread(RequestSender::request, finalurl, finalpath, h, true, body, u.ctype_).detach();
+            }
+            catch (...) {
+                continue;
+            }
 			#else
 			RequestSender::request(finalurl, finalpath, h, true, body, u.ctype_);
 			#endif
