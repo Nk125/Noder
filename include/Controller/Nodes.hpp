@@ -1,6 +1,7 @@
 #pragma once
 #include <algorithm>
 #include <Controller/Conveyor.hpp>
+#include <Controller/Defines.hpp>
 #include <Controller/rang.hpp>
 #include <Controller/User.hpp>
 #include <fstream>
@@ -12,8 +13,10 @@
 class Nodes {
 private:
     enum {
-        Unauthorized = 0,
-        EmptyURL
+        Unknown = 0,
+        Unauthorized,
+        EmptyURL,
+        OutOfIndex
     };
 
     struct Node {
@@ -40,42 +43,101 @@ private:
 
     std::vector<Node> nodes;
 
-    bool easyNodeAuth(size_t id) {
-        Node node;
+    void printError(size_t err) {
+        std::string modname = "Authorization";
 
+        switch (err) {
+            default:
+            case Unknown:
+            {
+                User::Error("Unknown error", modname);
+            }
+            break;
+            case Unauthorized:
+            {
+                User::Error("Unauthorized token", modname);
+            }
+            break;
+            case EmptyURL:
+            {
+                User::Error("Node URL is empty", modname);
+            }
+            break;
+            case OutOfIndex:
+            {
+                User::Error("Node id isn't on node list", modname);
+            }
+            break;
+        }
+    }
+
+    bool easyNodeAuth(size_t id, std::string token = "") {
+        try {
+            internalAuthorize(id, token);
+
+            return true;
+        }
+        catch (std::runtime_error& e) {
             try {
-                if (!getNodeFromID(node, nid)) {
-                    return false;
-                }
-
-                internalAuthorize(node, token);
-
-                return true;
+                printError(std::stoull(e.what()));
             }
             catch (...) {
-                return false;
+                printError(Unknown);
             }
+
+            return false;
+        }
+        catch (...) {
+            printError(Unknown);
+                
+            return false;
+        }
 
         return false;
     }
 
-    void internalAuthorize(Node& node, std::string token) {
-        std::string nurl = node.url, modname = "Internal Authorization";
+    size_t safeConvert(std::string id) {
+        try {
+            return std::stoull(id) - 1;
+        }
+        catch (...) {
+            return (-1);
+        }
+    }
+
+    void internalAuthorize(size_t nid, std::string token) {
+        if (nid == size_t(-1)) {
+            throw std::runtime_error(std::to_string(OutOfIndex));
+            return;
+        }
+
+        Node node;
+        
+        try {
+            node = nodes.at(nid);
+        }
+        catch (...) {
+            throw std::runtime_error(std::to_string(OutOfIndex));
+            return;
+        }
+        
+        std::string nurl = node.url;
         
         if (nurl.empty()) {
-            User::Error("Node url is empty!", modname);
             throw std::runtime_error(std::to_string(EmptyURL));
             return;
         }
 
-        Conveyor nodetalk(nurl);
+        bool onlyCheck = token.empty();
 
-        nodetalk.AddToken(token);
+        Conveyor nodetalk(nurl, (onlyCheck ? node.token : token));
 
         if (!nodetalk.AuthorizationCheck()) {
             throw std::runtime_error(std::to_string(Unauthorized));
         }
         else {
+            if (onlyCheck) return;
+
             node.token = token;
         }
     }
@@ -88,17 +150,6 @@ private:
         return nem;
     }
 
-    bool getNodeFromID(Node& node, size_t nid) {
-        try {
-            node = nodes.at(nid);
-            return true;
-        }
-        catch (...) {
-            User::Error("ID out of range", "Node List");
-            return false;
-        }
-    }
-
 public:
     void Authorize() {
         if (isNodeListEmpty()) return;
@@ -107,8 +158,8 @@ public:
 
         if (!User::Request(token, "Insert the token for all nodes")) return;
         
-        for (size_t nid = 1; nid < nodes.size(); nid++) {
-            if (!easyNodeAuth(nid - 1)) {
+        for (size_t nid = 1; nid <= nodes.size(); nid++) {
+            if (!easyNodeAuth(nid - 1, token)) {
                 User::Error("Node #" + std::to_string(nid) + " wasn't authorized", modname);
             }
             else {
@@ -134,38 +185,13 @@ public:
 
         if (!User::Request(token, "Insert the token")) return;
 
-        try {
-            size_t nid = std::stoull(id) - 1;
+        size_t nid = safeConvert(id);
 
-            Node node;
-
-            if (!getNodeFromID(node, nid)) {
-                User::Error("Invalid node number", modname);
-                return;
-            }
-
-            internalAuthorize(node, token);
+        if (!easyNodeAuth(nid, token)) {
+            User::Error("Node wasn't authorized", modname);
         }
-        catch (std::runtime_error& e) {
-            switch (std::stoi(e.what())) {
-            case Unauthorized:
-                User::Error("Token wasn't authorized", modname);
-                return;
-                break;
-            case EmptyURL:
-                User::Error("Node url is empty", modname);
-                return;
-                break;
-            default:
-                break;
-            }
-
-            throw std::exception();
-            return;
-        }
-        catch (...) {
-            User::Error("Unknown error authenticating token", modname);
-            return;
+        else {
+            User::Notify("Node authorized!", modname);
         }
 
         if (token == "default") {
@@ -246,7 +272,7 @@ public:
                 j = j.at("nodes");
 
                 if (j.size() <= 0) {
-                    User::Warn("Node list is empty");
+                    User::Warn("Node list is empty, stopping import");
                     return;
                 }
 
@@ -316,35 +342,14 @@ public:
 
         size_t nid = 0;
         for (Node& node : nodes) {
+            if (!easyNodeAuth(nid)) {
+                User::Error("Node #" + std::to_string(++nid) + " has an invalid token", modname);
+                continue;
+            }
+
             nid++;
 
-            try {
-                internalAuthorize(node, node.token);
-            }
-            catch (std::runtime_error& e) {
-                switch (std::stoi(e.what())) {
-                case Unauthorized:
-                    User::Error("Token wasn't authorized on node " + std::to_string(nid), modname);
-                    return;
-                    break;
-                case EmptyURL:
-                    User::Error("Url is empty on node " + std::to_string(nid), modname);
-                    return;
-                    break;
-                default:
-                    break;
-                }
-
-                throw std::exception();
-                return;
-            }
-            catch (...) {
-                User::Error("Unknown error checking token of node" + std::to_string(nid), modname);
-                return;
-            }
-
-            Conveyor nodetalk(node.url);
-            nodetalk.AddToken(node.token);
+            Conveyor nodetalk(node.url, node.token);
 
             bool online = nodetalk.Check();
 
@@ -374,39 +379,14 @@ public:
         std::cout << "Reloading config of " << rang::fg::yellow << "all" << rang::fg::reset << " nodes...\n";
 
         for (size_t nid = 1; nid <= nodes.size(); nid++) {
-            Node node;
-            
-            try {
-                if (!getNodeFromID(node, nid - 1)) {
-                    throw std::exception();
-                }
-
-                internalAuthorize(node, node.token);
-            }
-            catch (std::runtime_error& e) {
-                switch (std::stoi(e.what())) {
-                case Unauthorized:
-                    User::Error("Token wasn't authorized on node " + std::to_string(nid), modname);
-                    return;
-                    break;
-                case EmptyURL:
-                    User::Error("Node url is empty" + std::to_string(nid), modname);
-                    return;
-                    break;
-                default:
-                    break;
-                }
-
-                throw std::exception();
-                return;
-            }
-            catch (...) {
-                User::Error("Unknown error checking token", modname);
-                return;
+            if (!easyNodeAuth(nid - 1)) {
+                User::Error("Node #" + std::to_string(nid) + " have an invalid token", modname);
+                continue;
             }
 
-            Conveyor nodetalk(node.url);
-            nodetalk.AddToken(node.token);
+            Node& node = nodes.at(nid - 1);
+
+            Conveyor nodetalk(node.url, node.token);
 
             bool online = nodetalk.Check(), reloaded = nodetalk.ReloadConfig();
 
@@ -419,10 +399,8 @@ public:
                 }
             }
             else {
-                User::Error("Node " + std::to_string(nid) + " is offline", modname);
+                User::Error("Node #" + std::to_string(nid) + " is offline", modname);
             }
-
-            nid++;
         }
     }
 
@@ -437,27 +415,14 @@ public:
 
         bool online, reloaded;
 
-        size_t nid = std::stoull(id) - 1;
-
-        Node node;
-
-        if (!getNodeFromID(node, nid)) {
-            User::Error("Invalid node number", modname);
+        if (!easyNodeAuth(safeConvert(id))) {
+            User::Error("Node token is invalid or id is incorrect", modname);
             return;
         }
 
-        try {
-            internalAuthorize(node, node.token);
-        }
-        catch (std::runtime_error& e) {
-            if (std::string(e.what()) == std::to_string(Unauthorized)) {
-                User::Error("Invalid token", modname);
-                return;
-            }
-        }
+        Node& node = nodes.at(safeConvert(id));
 
-        Conveyor nodetalk(node.url);
-        nodetalk.AddToken(node.token);
+        Conveyor nodetalk(node.url, node.token);
 
         online = nodetalk.Check(), reloaded = nodetalk.ReloadConfig();
 
@@ -468,10 +433,58 @@ public:
 
     void MassGet() {
         if (isNodeListEmpty()) return;
+
+        std::string url, uag;
+        if (!User::Request(url, "Enter the url to send requests")) return;
+        if (!User::Request(uag, "Enter the User Agent")) return;
+
+        size_t id = 0;
+        for (; id < nodes.size(); id++) {
+            if (!easyNodeAuth(id)) {
+                User::Error("Node #" + std::to_string(id) + " have an invalid token");
+                continue;
+            }
+
+            Node& node = nodes.at(id);
+            Conveyor nodetalk(node.url, node.token);
+
+            if (!nodetalk.Mass(Conveyor::Request::GET, MasserData(url, uag))) {
+                User::Error("Failed sending data to node #" + std::to_string(id));
+                continue;
+            }
+            else {
+                User::Notify("Succesfully sent data to node #" + std::to_string(id));
+            }
+        }
     }
 
     void MassPost() {
         if (isNodeListEmpty()) return;
+
+        std::string url, uag, body, ctype;
+        if (!User::Request(url, "Enter the url to send requests")) return;
+        if (!User::Request(uag, "Enter the User Agent")) return;
+        if (!User::Request(body, "Enter the Body")) return;
+        if (!User::Request(ctype, "Enter the Content Type")) return;
+
+        size_t id = 0;
+        for (; id < nodes.size(); id++) {
+            if (!easyNodeAuth(id)) {
+                User::Error("Node #" + std::to_string(id) + " have an invalid token");
+                continue;
+            }
+
+            Node& node = nodes.at(id);
+            Conveyor nodetalk(node.url, node.token);
+
+            if (!nodetalk.Mass(Conveyor::Request::POST, MasserData(url, uag, body, ctype))) {
+                User::Error("Failed sending data to node #" + std::to_string(id));
+                continue;
+            }
+            else {
+                User::Notify("Succesfully sent data to node #" + std::to_string(id));
+            }
+        }
     }
 
     void SingleMassGet() {

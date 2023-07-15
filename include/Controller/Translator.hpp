@@ -1,4 +1,5 @@
 #pragma once
+#include <Controller/Defines.hpp>
 #include <json.hpp>
 #include <string>
 
@@ -29,5 +30,25 @@ public:
         catch (...) {
             return "";
         }
+    }
+
+    static std::string buildGETData(MasserData mdata) {
+        nlohmann::json j = {
+            {"url", mdata.url},
+            {"useragent", mdata.uag}
+        };
+
+        return j.dump();
+    }
+
+    static std::string buildPOSTData(MasserData mdata) {
+        nlohmann::json j = {
+            {"url", mdata.url},
+            {"useragent", mdata.uag},
+            {"body", mdata.body},
+            {"contenttype", mdata.ctype}
+        };
+
+        return j.dump();
     }
 };

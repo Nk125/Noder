@@ -1,4 +1,5 @@
 #pragma once
+#include <Controller/Defines.hpp>
 #include <Controller/Translator.hpp>
 #include <httplib.h>
 
@@ -7,9 +8,16 @@ private:
     std::shared_ptr<httplib::Client> http;
 
 public:
-    Conveyor(std::string url) {
+    enum Request {
+        GET = 1,
+        POST
+    };
+
+    Conveyor(std::string url, std::string token = "") {
         http = std::make_shared<httplib::Client>(url);
         http->set_keep_alive(true);
+
+        if (!token.empty()) AddToken(token);
     }
 
     ~Conveyor() {
@@ -99,5 +107,30 @@ public:
         else {
             return "";
         }
+    }
+
+    bool Mass(size_t type, MasserData mdata) {
+        httplib::Result res;
+
+        switch (type) {
+        case Request::GET:
+        {
+            res = http->Post("/get", Translator::buildGETData(mdata), "application/json");
+        }
+            break;
+        case Request::POST:
+        {
+            res = http->Post("/post", Translator::buildPOSTData(mdata), "application/json");
+        }
+            break;
+        default:
+            return false;
+            break;
+        }
+
+        if (res) {
+            return Translator::checkStatus(res->body);
+        }
+        else return false;
     }
 };
