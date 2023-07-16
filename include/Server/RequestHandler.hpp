@@ -3,10 +3,9 @@
 #include <json.hpp>
 #include <Server/Config.hpp>
 #include <Server/RequestSender.hpp>
-#include <Server/Time.hpp>
-#if USE_THREAD_POOL
 #include <Server/Threading.hpp>
-#else
+#include <Server/Time.hpp>
+#if !USE_THREAD_POOL
 #include <thread>
 #endif
 

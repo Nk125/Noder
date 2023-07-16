@@ -437,26 +437,26 @@ public:
     void MassGet() {
         if (isNodeListEmpty()) return;
 
-        std::string url, uag;
+        std::string url, uag, modname = "Mass GET";
         if (!User::Request(url, "Enter the url to send requests")) return;
         if (!User::Request(uag, "Enter the User Agent")) return;
 
-        size_t id = 0;
-        for (; id < nodes.size(); id++) {
+        size_t id = 1;
+        for (; id <= nodes.size(); id++) {
             if (!easyNodeAuth(id)) {
-                User::Error("Node #" + std::to_string(id) + " have an invalid token");
+                User::Error("Node #" + std::to_string(id) + " have an invalid token", modname);
                 continue;
             }
 
-            Node& node = nodes.at(id);
+            Node& node = nodes.at(id - 1);
             Conveyor nodetalk(node.url, node.token);
 
             if (!nodetalk.Mass(Conveyor::Request::GET, MasserData(url, uag))) {
-                User::Error("Failed sending data to node #" + std::to_string(id));
+                User::Error("Failed sending data to node #" + std::to_string(id), modname);
                 continue;
             }
             else {
-                User::Notify("Succesfully sent data to node #" + std::to_string(id));
+                User::Notify("Succesfully sent data to node #" + std::to_string(id), modname);
             }
         }
     }
@@ -464,28 +464,28 @@ public:
     void MassPost() {
         if (isNodeListEmpty()) return;
 
-        std::string url, uag, body, ctype;
+        std::string url, uag, body, ctype, modname = "Mass POST";
         if (!User::Request(url, "Enter the url to send requests")) return;
         if (!User::Request(uag, "Enter the User Agent")) return;
         if (!User::Request(body, "Enter the Body")) return;
         if (!User::Request(ctype, "Enter the Content Type")) return;
 
-        size_t id = 0;
-        for (; id < nodes.size(); id++) {
+        size_t id = 1;
+        for (; id <= nodes.size(); id++) {
             if (!easyNodeAuth(id)) {
-                User::Error("Node #" + std::to_string(id) + " have an invalid token");
+                User::Error("Node #" + std::to_string(id) + " have an invalid token", modname);
                 continue;
             }
 
-            Node& node = nodes.at(id);
+            Node& node = nodes.at(id - 1);
             Conveyor nodetalk(node.url, node.token);
 
             if (!nodetalk.Mass(Conveyor::Request::POST, MasserData(url, uag, body, ctype))) {
-                User::Error("Failed sending data to node #" + std::to_string(id));
+                User::Error("Failed sending data to node #" + std::to_string(id), modname);
                 continue;
             }
             else {
-                User::Notify("Succesfully sent data to node #" + std::to_string(id));
+                User::Notify("Succesfully sent data to node #" + std::to_string(id), modname);
             }
         }
     }
@@ -496,5 +496,38 @@ public:
 
     void SingleMassPost() {
         if (isNodeListEmpty()) return;
+    }
+
+    void Restart() {
+        std::string modname = "Restart";
+        if (isNodeListEmpty()) return;
+
+        std::cout << "Restarting " << rang::fg::yellow << "all" << rang::fg::reset << " nodes...\n";
+
+        size_t nid = 0;
+        for (Node& node : nodes) {
+            if (!easyNodeAuth(nid)) {
+                User::Error("Node #" + std::to_string(++nid) + " has an invalid token", modname);
+                continue;
+            }
+
+            nid++;
+
+            Conveyor nodetalk(node.url, node.token);
+
+            bool online = nodetalk.Check();
+
+            if (online) {
+                if (nodetalk.Restart()) {
+                    User::Notify("Node #" + std::to_string(nid) + " restarted!", modname);
+                }
+                else {
+                    User::Error("Node #" + std::to_string(nid) + " couldn't be restarted", modname);
+                }
+            }
+            else {
+                User::Error("Node #" + std::to_string(nid) + " isn't online", modname);
+            }
+        }
     }
 };

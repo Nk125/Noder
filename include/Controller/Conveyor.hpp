@@ -56,10 +56,18 @@ public:
         return (Translator::checkStatus(res->body));
     }
 
+    bool Restart() {
+        httplib::Result res = http->Get("/server/restart");
+
+        if (!res) return false;
+
+        return (Translator::checkStatus(res->body));
+    }
+
     std::string Uptime(bool human = false) {
         httplib::Result res = http->Get("/server/uptime");
 
-        if (!res) return 0;
+        if (!res) return "0";
 
         std::string body = res->body;
 
@@ -91,14 +99,14 @@ public:
             }
         }
         else {
-            return 0;
+            return "0";
         }
     }
 
     std::string IP() {
         httplib::Result res = http->Get("/server/ip");
 
-        if (!res) return 0;
+        if (!res) return "";
 
         std::string body = res->body;
 

