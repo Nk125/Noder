@@ -5,7 +5,7 @@
 #if ENABLE_REGEX_IN_POST_REQUESTS
 #include <regex>
 #endif
-#if USE_THREAD_POOL
+#if USE_THREAD_POOL_FOR_REQUESTER
 #include <Server/Threading.hpp>
 #else
 #include <thread>
@@ -84,7 +84,7 @@ public:
 		while (!stopThreads) {
 			#if USE_THREADING_IN_REQUESTS
             try {
-				#if USE_THREAD_POOL
+				#if USE_THREAD_POOL_FOR_REQUESTER
                 Threading::threader->push_task
 				#else
 				std::thread t
@@ -92,7 +92,7 @@ public:
 
 				(RequestSender::request, finalurl, finalpath, h, false, std::string(""), std::string(""));
 
-				#if !USE_THREAD_POOL
+				#if !USE_THREAD_POOL_FOR_REQUESTER
 				t.detach();
 				#endif
             }
@@ -136,7 +136,7 @@ public:
 
 			#if USE_THREADING_IN_REQUESTS
             try {
-				#if USE_THREAD_POOL
+				#if USE_THREAD_POOL_FOR_REQUESTER
                 Threading::threader->push_task
 				#else
 				std::thread t
@@ -144,7 +144,7 @@ public:
 
 				(RequestSender::request, finalurl, finalpath, h, true, body, u.ctype_);
 
-				#if !USE_THREAD_POOL
+				#if !USE_THREAD_POOL_FOR_REQUESTER
 				t.detach();
 				#endif
             }

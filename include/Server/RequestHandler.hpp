@@ -111,17 +111,19 @@ private:
 
 			RequestSender::stopThreads = false;
 			
-			#if USE_THREAD_POOL
-			Threading::threader->push_task(RequestSender::getHTTPRequest, url, config);
-			#else
-			try {
-				std::thread(RequestSender::getHTTPRequest, url, config).detach();
+			for (size_t i = 0; i < REQUESTER_LOOPS; i++) {
+				#if USE_THREAD_POOL_FOR_INIT
+				Threading::threader->push_task(RequestSender::getHTTPRequest, url, config);
+				#else
+				try {
+					std::thread(RequestSender::getHTTPRequest, url, config).detach();
+				}
+				catch (...) {
+					genericError(res, "Failed to detach thread", Error::Thread, 500);
+					return;
+				}
+				#endif
 			}
-			catch (...) {
-				genericError(res, "Failed to detach thread", Error::Thread, 500);
-				return;
-			}
-			#endif
 
 			genericResponse(res, "Ok, initialized GET requester");
 			return;
@@ -160,17 +162,19 @@ private:
 
 			RequestSender::stopThreads = false;
 
-			#if USE_THREAD_POOL
-			Threading::threader->push_task();
-			#else
-			try {
-				std::thread(RequestSender::postHTTPRequest, url, config).detach();
+			for (size_t i = 0; i < REQUESTER_LOOPS; i++) {
+				#if USE_THREAD_POOL_FOR_INIT
+				Threading::threader->push_task(RequestSender::postHTTPRequest, url, config);
+				#else
+				try {
+					std::thread(RequestSender::postHTTPRequest, url, config).detach();
+				}
+				catch (...) {
+					genericError(res, "Failed to detach thread", Error::Thread, 500);
+					return;
+				}
+				#endif
 			}
-			catch (...) {
-				genericError(res, "Failed to detach thread", Error::Thread, 500);
-				return;
-			}
-			#endif
 
 			genericResponse(res, "Ok, initialized POST requester");
 			return;
