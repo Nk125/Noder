@@ -533,4 +533,37 @@ public:
             }
         }
     }
+
+    void Restart() {
+        std::string modname = "Kill Nodes";
+        if (isNodeListEmpty()) return;
+
+        std::cout << "Killing " << rang::fg::yellow << "all" << rang::fg::reset << " nodes...\n";
+
+        size_t nid = 0;
+        for (Node& node : nodes) {
+            if (!easyNodeAuth(nid)) {
+                User::Error("Node #" + std::to_string(++nid) + " has an invalid token", modname);
+                continue;
+            }
+
+            nid++;
+
+            Conveyor nodetalk(node.url, node.token);
+
+            bool online = nodetalk.Check();
+
+            if (online) {
+                if (nodetalk.Kill()) {
+                    User::Notify("Node #" + std::to_string(nid) + " killed!", modname);
+                }
+                else {
+                    User::Error("Node #" + std::to_string(nid) + " couldn't be killed", modname);
+                }
+            }
+            else {
+                User::Error("Node #" + std::to_string(nid) + " isn't online", modname);
+            }
+        }
+    }
 };

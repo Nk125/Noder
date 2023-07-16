@@ -3,6 +3,7 @@
 #include <Controller/Defines.hpp>
 #include <Controller/Translator.hpp>
 #include <httplib.h>
+#include <PATHS.h>
 
 class Conveyor {
 private:
@@ -33,7 +34,7 @@ public:
     }
 
     bool AuthorizationCheck() {
-        httplib::Result res = http->Get("/server/check");
+        httplib::Result res = http->Get(URL::SERVER::CHECK);
 
         if (!res) return false;
 
@@ -41,7 +42,7 @@ public:
     }
 
     bool Check() {
-        httplib::Result res = http->Get("/server/check");
+        httplib::Result res = http->Get(URL::SERVER::CHECK);
 
         if (!res) return false;
 
@@ -49,7 +50,7 @@ public:
     }
 
     bool ReloadConfig() {
-        httplib::Result res = http->Get("/server/config/reload");
+        httplib::Result res = http->Get(URL::SERVER::CONFIG::RELOAD);
 
         if (!res) return false;
 
@@ -57,7 +58,15 @@ public:
     }
 
     bool Restart() {
-        httplib::Result res = http->Get("/server/restart");
+        httplib::Result res = http->Get(URL::SERVER::RESTART);
+
+        if (!res) return false;
+
+        return (Translator::checkStatus(res->body));
+    }
+
+    bool Kill() {
+        httplib::Result res = http->Get(URL::SERVER::KILL);
 
         if (!res) return false;
 
@@ -65,7 +74,7 @@ public:
     }
 
     std::string Uptime(bool human = false) {
-        httplib::Result res = http->Get("/server/uptime");
+        httplib::Result res = http->Get(URL::SERVER::UPTIME);
 
         if (!res) return "0";
 
@@ -104,7 +113,7 @@ public:
     }
 
     std::string IP() {
-        httplib::Result res = http->Get("/server/ip");
+        httplib::Result res = http->Get(URL::SERVER::IP);
 
         if (!res) return "";
 
@@ -124,12 +133,12 @@ public:
         switch (type) {
         case Request::GET:
         {
-            res = http->Post("/get", Translator::buildGETData(mdata), "application/json");
+            res = http->Post(URL::GET, Translator::buildGETData(mdata), "application/json");
         }
             break;
         case Request::POST:
         {
-            res = http->Post("/post", Translator::buildPOSTData(mdata), "application/json");
+            res = http->Post(URL::POST, Translator::buildPOSTData(mdata), "application/json");
         }
             break;
         default:

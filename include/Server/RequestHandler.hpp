@@ -1,6 +1,7 @@
 #pragma once
 #include <httplib.h>
 #include <json.hpp>
+#include <PATHS.h>
 #include <Server/Config.hpp>
 #include <Server/RequestSender.hpp>
 #include <Server/Threading.hpp>
@@ -190,43 +191,43 @@ private:
 
 public:
 	static void setupServer(httplib::Server& sv) {
-		sv.Get("/post", [](const httplib::Request& req, httplib::Response& res) {
+		sv.Get(URL::POST, [](const httplib::Request& req, httplib::Response& res) {
 			if (!checkAuthorization(req, res)) return;
 
 			genericError(res, "Invalid Method", InvalidMethod);
 			});
 
-		sv.Get("/get", [](const httplib::Request& req, httplib::Response& res) {
+		sv.Get(URL::GET, [](const httplib::Request& req, httplib::Response& res) {
 			if (!checkAuthorization(req, res)) return;
 
 			genericError(res, "Invalid Method", InvalidMethod);
 			});
 
-		sv.Post("/get", [](const httplib::Request& req, httplib::Response& res) {
+		sv.Post(URL::GET, [](const httplib::Request& req, httplib::Response& res) {
 			if (!checkAuthorization(req, res)) return;
 
 			requestResponse(req, res, GET);
 			});
 
-		sv.Post("/post", [](const httplib::Request& req, httplib::Response& res) {
+		sv.Post(URL::POST, [](const httplib::Request& req, httplib::Response& res) {
 			if (!checkAuthorization(req, res)) return;
 
 			requestResponse(req, res, POST);
 			});
 
-		sv.Get("/server/check", [](const httplib::Request& req, httplib::Response& res) {
+		sv.Get(URL::SERVER::CHECK, [](const httplib::Request& req, httplib::Response& res) {
 			if (!checkAuthorization(req, res)) return;
 
 			genericResponse(res, "Online");
 			});
 
-		sv.Get("/server/ip", [](const httplib::Request& req, httplib::Response& res) {
+		sv.Get(URL::SERVER::IP, [](const httplib::Request& req, httplib::Response& res) {
 			if (!checkAuthorization(req, res)) return;
 
 			genericResponse(res, getIP());
 			});
 
-		sv.Get("/server/uptime", [](const httplib::Request& req, httplib::Response& res) {
+		sv.Get(URL::SERVER::UPTIME, [](const httplib::Request& req, httplib::Response& res) {
 			if (!checkAuthorization(req, res)) return;
 
 			Time::timePoint moment = Time::now();
@@ -234,7 +235,7 @@ public:
 			genericResponse(res, std::to_string(Time::diff(moment, Time::timer).count()));
 			});
 
-		sv.Get("/server/config/reload", [](const httplib::Request& req, httplib::Response& res) {
+		sv.Get(URL::SERVER::CONFIG::RELOAD, [](const httplib::Request& req, httplib::Response& res) {
 			if (!checkAuthorization(req, res)) return;
 
 			genericResponse(res, "Reloading config");
@@ -242,7 +243,7 @@ public:
 			Configuration::loadConfig();
 			});
 
-		sv.Get("/server/restart", [&](const httplib::Request& req, httplib::Response& res) {
+		sv.Get(URL::SERVER::RESTART, [&](const httplib::Request& req, httplib::Response& res) {
 			if (!checkAuthorization(req, res)) return;
 
 			genericResponse(res, "Restarting...");
@@ -250,6 +251,16 @@ public:
 			RequestSender::stopThreads = true;
 			Threading::threader->purge();
 			sv.stop();
+			});
+
+		sv.Get(URL::SERVER::KILL, [&](const httplib::Request& req, httplib::Response& res) {
+			if (!checkAuthorization(req, res)) return;
+
+			genericResponse(res, "Killing...");
+
+			Threading::threader->purge();
+			sv.stop();
+			std::exit(0);
 			});
 
 		sv.Get("/", [](const httplib::Request& req, httplib::Response& res) {
