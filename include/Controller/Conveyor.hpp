@@ -9,6 +9,14 @@ class Conveyor {
 private:
     std::shared_ptr<httplib::Client> http;
 
+    bool genericChecker(std::string uri) {
+        httplib::Result res = http->Get(uri);
+
+        if (!res) return false;
+
+        return (Translator::checkStatus(res->body));
+    }
+
 public:
     enum Request {
         GET = 1,
@@ -42,35 +50,19 @@ public:
     }
 
     bool Check() {
-        httplib::Result res = http->Get(URL::SERVER::CHECK);
-
-        if (!res) return false;
-
-        return (Translator::checkStatus(res->body));
+        return genericChecker(URL::SERVER::CHECK);
     }
 
     bool ReloadConfig() {
-        httplib::Result res = http->Get(URL::SERVER::CONFIG::RELOAD);
-
-        if (!res) return false;
-
-        return (Translator::checkStatus(res->body));
+        return genericChecker(URL::SERVER::CONFIG::RELOAD);
     }
 
     bool Restart() {
-        httplib::Result res = http->Get(URL::SERVER::RESTART);
-
-        if (!res) return false;
-
-        return (Translator::checkStatus(res->body));
+        return genericChecker(URL::SERVER::RESTART);
     }
 
     bool Kill() {
-        httplib::Result res = http->Get(URL::SERVER::KILL);
-
-        if (!res) return false;
-
-        return (Translator::checkStatus(res->body));
+        return genericChecker(URL::SERVER::KILL);
     }
 
     std::string Uptime(bool human = false) {
