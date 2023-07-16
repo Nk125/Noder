@@ -443,7 +443,7 @@ public:
 
         size_t id = 1;
         for (; id <= nodes.size(); id++) {
-            if (!easyNodeAuth(id)) {
+            if (!easyNodeAuth(id - 1)) {
                 User::Error("Node #" + std::to_string(id) + " have an invalid token", modname);
                 continue;
             }
@@ -473,7 +473,7 @@ public:
 
         size_t id = 1;
         for (; id <= nodes.size(); id++) {
-            if (!easyNodeAuth(id)) {
+            if (!easyNodeAuth(id - 1)) {
                 User::Error("Node #" + std::to_string(id) + " have an invalid token", modname);
                 continue;
             }
@@ -495,10 +495,63 @@ public:
 
     void SingleMassGet() {
         if (isNodeListEmpty()) return;
+
+        std::string id, url, uag, modname = "Single Mass Get";
+
+        if (!User::Request(id, "Enter the node number")) return;
+        if (!User::Request(url, "Enter the url to send requests")) return;
+        if (!User::Request(uag, "Enter the User Agent")) return;
+
+        if (!easyNodeAuth(safeConvert(id))) {
+            User::Error("Node token is invalid or id is incorrect", modname);
+            return;
+        }
+
+        Node& node = nodes.at(safeConvert(id));
+
+        Conveyor nodetalk(node.url, node.token);
+
+        if (!nodetalk.Check()) User::Error("Node is offline", modname);
+
+        if (!nodetalk.Mass(Conveyor::Request::GET, MasserData(url, uag))) {
+            User::Error("Failed sending data to the node", modname);
+            return;
+        }
+
+        User::Notify("Succesfully sent requester info", modname);
     }
 
     void SingleMassPost() {
         if (isNodeListEmpty()) return;
+
+        std::string id, url, uag, body, ctype, rgx, modname = "Single Mass Post";
+
+        if (!User::Request(id, "Enter the node number")) return;
+        if (!User::Request(url, "Enter the url to send requests")) return;
+        if (!User::Request(uag, "Enter the User Agent")) return;
+        if (!User::Request(body, "Enter the Body")) return;
+        if (!User::Request(ctype, "Enter the Content Type")) return;
+        if (!User::Request(rgx, "The body uses regex? Type \"yes\" to confirm")) return;
+
+        if (!easyNodeAuth(safeConvert(id))) {
+            User::Error("Node token is invalid or id is incorrect", modname);
+            return;
+        }
+
+        Node& node = nodes.at(safeConvert(id));
+
+        Conveyor nodetalk(node.url, node.token);
+
+        if (!nodetalk.Check()) User::Error("Node is offline", modname);
+
+        std::transform(rgx.cbegin(), rgx.cend(), std::inserter(rgx, rgx.end()), tolower);
+
+        if (!nodetalk.Mass(Conveyor::Request::POST, MasserData(url, uag, body, ctype, (rgx == "yes")))) {
+            User::Error("Failed sending data to the node", modname);
+            return;
+        }
+
+        User::Notify("Succesfully sent requester info", modname);
     }
 
     void Restart() {
