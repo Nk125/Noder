@@ -554,12 +554,9 @@ public:
             bool online = nodetalk.Check();
 
             if (online) {
-                if (nodetalk.Kill()) {
-                    User::Notify("Node #" + std::to_string(nid) + " killed!", modname);
-                }
-                else {
-                    User::Error("Node #" + std::to_string(nid) + " couldn't be killed", modname);
-                }
+                nodetalk.Kill();
+                
+                User::Notify("Sent kill instruction to node #" + std::to_string(nid), modname);
             }
             else {
                 User::Error("Node #" + std::to_string(nid) + " isn't online", modname);
