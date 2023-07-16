@@ -33,7 +33,7 @@ private:
         }
 
         static nlohmann::json to_json(const Node& n) {
-            return nlohmann::json{ {"url", n.url}, {"token", n.token}};
+            return nlohmann::json{{"url", n.url}, {"token", n.token}};
         }
 
         static Node from_json(const nlohmann::json& j) {
@@ -79,7 +79,7 @@ private:
         }
         catch (std::runtime_error& e) {
             try {
-                printError(std::stoull(e.what()));
+                printError(std::stoull(std::string(e.what())));
             }
             catch (...) {
                 printError(Unknown);
@@ -111,17 +111,17 @@ private:
             return;
         }
 
-        Node node;
+        Node* node;
         
         try {
-            node = nodes.at(nid);
+            node = &nodes.at(nid);
         }
         catch (...) {
             throw std::runtime_error(std::to_string(OutOfIndex));
             return;
         }
         
-        std::string nurl = node.url;
+        std::string nurl = node->url;
         
         if (nurl.empty()) {
             throw std::runtime_error(std::to_string(EmptyURL));
@@ -130,7 +130,7 @@ private:
 
         bool onlyCheck = token.empty();
 
-        Conveyor nodetalk(nurl, (onlyCheck ? node.token : token));
+        Conveyor nodetalk(nurl, (onlyCheck ? node->token : token));
 
         if (!nodetalk.AuthorizationCheck()) {
             throw std::runtime_error(std::to_string(Unauthorized));
@@ -138,7 +138,7 @@ private:
         else {
             if (onlyCheck) return;
 
-            node.token = token;
+            node->token = token;
         }
     }
 
@@ -298,10 +298,13 @@ public:
 
         if (!User::Request(file, "Enter the file name to export nodes")) return;
 
-        nlohmann::json j;
-        j["nodes"] = nlohmann::json::array();
+        nlohmann::json j {
+            {"nodes", nlohmann::json::array()}
+        };
 
-        std::transform(nodes.begin(), nodes.end(), std::inserter(j, j.end()), Node::to_json);
+        nlohmann::json& arr = j["nodes"];
+
+        std::transform(nodes.begin(), nodes.end(), std::inserter(arr, arr.end()), Node::to_json);
 
         std::ofstream o(file, std::ios::binary);
 

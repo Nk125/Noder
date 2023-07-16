@@ -1,4 +1,5 @@
 #pragma once
+#define CPPHTTPLIB_OPENSSL_SUPPORT
 #include <Controller/Defines.hpp>
 #include <Controller/Translator.hpp>
 #include <httplib.h>
@@ -36,7 +37,7 @@ public:
 
         if (!res) return false;
 
-        return (Translator::checkStatus(res->body) && !res->body.empty() && res->get_header_value("Content-Type") != "text/plain");
+        return (!res->body.empty() && res->get_header_value("Content-Type") != "text/plain" && Translator::checkStatus(res->body));
     }
 
     bool Check() {
