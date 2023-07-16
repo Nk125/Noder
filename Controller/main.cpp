@@ -69,5 +69,9 @@ int main() {
         nodes.Restart();
     });
 
+    user.RegisterFunction("Kill", "Kill all the processes on nodes", [&]() {
+        nodes.Kill();
+    });
+
     user.Welcome("the Node Controller");
 }
