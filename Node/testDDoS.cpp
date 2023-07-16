@@ -50,7 +50,7 @@ int main(int argc, char* argv[]) {
 
     std::cout << "Listening at port: " << port << "\n";
 
-    if (!sv.listen("127.0.0.1", port)) {
+    if (!sv.listen(host, port)) {
         std::cout << "Failed at listen\n";
     }
 }
