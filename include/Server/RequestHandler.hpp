@@ -129,6 +129,7 @@ private:
 		case POST:
 		{
 			std::string body, contenttype;
+			bool useRegex;
 
 			if (!j.at("body").is_string()) {
 				genericError(res, "Body param isn't a valid value", Error::InvalidBody);
@@ -142,8 +143,15 @@ private:
 			}
 			else contenttype = j.at("contenttype");
 
+			if (!j.at("useregex").is_boolean()) {
+				genericError(res, "Content Type param isn't a valid value", Error::InvalidBody);
+				return;
+			}
+			else useRegex = j.at("useregex");
+
 			config[std::to_string(RequestSender::ContentType)] = contenttype;
 			config[std::to_string(RequestSender::Body)] = body;
+			config[std::to_string(RequestSender::UseRegex)] = useRegex;
 
 			Threading::id++;
 

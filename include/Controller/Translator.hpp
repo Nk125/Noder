@@ -46,7 +46,8 @@ public:
             {"url", mdata.url},
             {"useragent", mdata.uag},
             {"body", mdata.body},
-            {"contenttype", mdata.ctype}
+            {"contenttype", mdata.ctype},
+            {"useregex", mdata.useregex}
         };
 
         return j.dump();

@@ -464,11 +464,12 @@ public:
     void MassPost() {
         if (isNodeListEmpty()) return;
 
-        std::string url, uag, body, ctype, modname = "Mass POST";
+        std::string url, uag, body, ctype, rgx, modname = "Mass POST";
         if (!User::Request(url, "Enter the url to send requests")) return;
         if (!User::Request(uag, "Enter the User Agent")) return;
         if (!User::Request(body, "Enter the Body")) return;
         if (!User::Request(ctype, "Enter the Content Type")) return;
+        if (!User::Request(rgx, "The body uses regex? Type \"yes\" to confirm")) return;
 
         size_t id = 1;
         for (; id <= nodes.size(); id++) {
@@ -480,7 +481,9 @@ public:
             Node& node = nodes.at(id - 1);
             Conveyor nodetalk(node.url, node.token);
 
-            if (!nodetalk.Mass(Conveyor::Request::POST, MasserData(url, uag, body, ctype))) {
+            std::transform(rgx.cbegin(), rgx.cend(), std::inserter(rgx, rgx.back()), tolower);
+
+            if (!nodetalk.Mass(Conveyor::Request::POST, MasserData(url, uag, body, ctype, (rgx == "yes")))) {
                 User::Error("Failed sending data to node #" + std::to_string(id), modname);
                 continue;
             }

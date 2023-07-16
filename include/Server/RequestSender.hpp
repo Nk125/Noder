@@ -2,7 +2,9 @@
 #include <httplib.h>
 #include <parser.hpp>
 #include <json.hpp>
+#if ENABLE_REGEX_IN_POST_REQUESTS
 #include <regex>
+#endif
 #if USE_THREAD_POOL
 #include <Server/Threading.hpp>
 #else
@@ -21,6 +23,7 @@ private:
 		return buf;
 	}
 
+	#if ENABLE_REGEX_IN_POST_REQUESTS
 	static void regenBody(std::string& body, std::string originalBody) {
 		{
 			body.clear();
@@ -41,6 +44,7 @@ private:
 			body.append(originalBody);
 		}
 	}
+	#endif
 
 	static void request(std::string url, std::string path, httplib::Headers h, bool post = false, std::string body = "", std::string ctype = "") {
 		httplib::Client c(url);
@@ -62,7 +66,8 @@ public:
 	enum {
 		UserAgent = 0,
 		ContentType,
-		Body
+		Body,
+		UseRegex
 	};
 
 	static void getHTTPRequest(std::string uri, nlohmann::json config) {
@@ -114,8 +119,21 @@ public:
 			{"User-Agent", config[std::to_string(UserAgent)]}
 		};
 
+		bool useRgx = config[std::to_string(UseRegex)];
+
+		#if !ENABLE_REGEX_IN_POST_REQUESTS
+		if (!useRgx) {
+			body = u.body_;
+		}
+		#endif
+
 		while (!stopThreads) {
-			regenBody(body, u.body_);
+			#if ENABLE_REGEX_IN_POST_REQUESTS
+			if (useRgx) {
+				regenBody(body, u.body_);
+			}
+			#endif
+
 			#if USE_THREADING_IN_REQUESTS
             try {
 				#if USE_THREAD_POOL
