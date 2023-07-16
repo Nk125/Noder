@@ -481,7 +481,7 @@ public:
             Node& node = nodes.at(id - 1);
             Conveyor nodetalk(node.url, node.token);
 
-            std::transform(rgx.cbegin(), rgx.cend(), std::inserter(rgx, rgx.back()), tolower);
+            std::transform(rgx.cbegin(), rgx.cend(), std::inserter(rgx, rgx.end()), tolower);
 
             if (!nodetalk.Mass(Conveyor::Request::POST, MasserData(url, uag, body, ctype, (rgx == "yes")))) {
                 User::Error("Failed sending data to node #" + std::to_string(id), modname);
@@ -534,7 +534,7 @@ public:
         }
     }
 
-    void Restart() {
+    void Kill() {
         std::string modname = "Kill Nodes";
         if (isNodeListEmpty()) return;
 
