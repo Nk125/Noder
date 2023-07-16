@@ -21,7 +21,7 @@ int main(int argc, char* argv[]) {
         return 0;
     }
 
-    host.assign((argc == 2 ? "127.0.0.1" : argv[3]));
+    host.assign((argc == 2 ? std::string("127.0.0.1") : std::string(argv[2])));
 
     port = std::stoi(argv[1]);
 
