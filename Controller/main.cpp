@@ -69,7 +69,7 @@ int main() {
         nodes.Restart();
     });
 
-    user.RegisterFunction("Kill", "Kill all the processes on nodes", [&]() {
+    user.RegisterFunction("Kill", "Kill the main process on all nodes", [&]() {
         nodes.Kill();
     });
 
