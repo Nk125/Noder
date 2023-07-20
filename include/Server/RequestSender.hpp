@@ -1,4 +1,5 @@
 #pragma once
+#include <Server/Time.hpp>
 #include <httplib.h>
 #include <parser.hpp>
 #include <json.hpp>
@@ -11,8 +12,14 @@
 #include <thread>
 #endif
 
+namespace Timer {
+        Time::timePoint tp;
+}
+
 class RequestSender {
 private:
+        static std::atomic<size_t> reqs;
+
 	static std::string genRanStr(const size_t len) {
 		std::random_device rd;
 		std::mt19937 mt(rd());
@@ -21,6 +28,12 @@ private:
 		std::string buf;
 		std::generate_n(std::inserter(buf, buf.end()), len, [&]() -> char {return (char)(uid(mt)); });
 		return buf;
+	}
+
+        static void logRequest() {
+		reqs++;
+		size_t secs = Time::diff(tp, Time::now());
+		std::cout << "\rAvg RPS: " << ;
 	}
 
 	#if ENABLE_REGEX_IN_POST_REQUESTS
@@ -71,6 +84,8 @@ public:
 	};
 
 	static void getHTTPRequest(std::string uri, nlohmann::json config) {
+		reqs = 0;
+		tp = Time::now();
 		urlparser u(uri);
 
 		if (u.host_.empty()) return;
@@ -102,10 +117,14 @@ public:
 			#else
 			RequestSender::request(finalurl, finalpath, h);
 			#endif
+
+			logRequest();
 		}
 	}
 
 	static void postHTTPRequest(std::string uri, nlohmann::json config) {
+		reqs = 0;
+		tp = Time::now();
 		urlparser u(uri);
 		
 		if (u.host_.empty()) return;
@@ -154,8 +173,11 @@ public:
 			#else
 			RequestSender::request(finalurl, finalpath, h, true, body, u.ctype_);
 			#endif
+
+			logRequest();
 		}
 	}
 };
 
 bool RequestSender::stopThreads = false;
+std::atomic<size_t> RequestSender::reqs = 0;
