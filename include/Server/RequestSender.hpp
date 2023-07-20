@@ -33,10 +33,15 @@ private:
         static void logRequest() {
 		reqs++;
 		Time::timePoint now = Time::now();
-		size_t secs = Time::diff(tp, now).count();
+		size_t secs = Time::diff(Timer::tp, now).count();
 		if (secs % 15 == 0) {
 			std::cout << "\rAvg RPS: " << (reqs / secs);
 		}
+	}
+
+        static void setupLogger() {
+		reqs = 0;
+		Timer::tp = Time::now();
 	}
 
 	#if ENABLE_REGEX_IN_POST_REQUESTS
@@ -87,8 +92,7 @@ public:
 	};
 
 	static void getHTTPRequest(std::string uri, nlohmann::json config) {
-		reqs = 0;
-		tp = Time::now();
+		setupLogger();
 		urlparser u(uri);
 
 		if (u.host_.empty()) return;
@@ -126,8 +130,7 @@ public:
 	}
 
 	static void postHTTPRequest(std::string uri, nlohmann::json config) {
-		reqs = 0;
-		tp = Time::now();
+		setupLogger();
 		urlparser u(uri);
 		
 		if (u.host_.empty()) return;
