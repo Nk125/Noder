@@ -34,7 +34,9 @@ private:
 		reqs++;
 		Time::timePoint now = Time::now();
 		size_t secs = Time::diff(tp, now).count();
-		std::cout << "\rAvg RPS: " << ;
+		if (secs % 15 == 0) {
+			std::cout << "\rAvg RPS: " << (reqs / secs);
+		}
 	}
 
 	#if ENABLE_REGEX_IN_POST_REQUESTS
