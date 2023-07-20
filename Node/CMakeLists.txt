@@ -35,6 +35,7 @@ target_compile_definitions(node PUBLIC
     USE_THREAD_POOL_FOR_REQUESTER=UseThreadPoolForRequester
     USE_THREAD_POOL_FOR_INIT=UseThreadPoolForInit
     ENABLE_REGEX_IN_POST_REQUESTS=EnableRegexInPostRequests
+    REQUESTER_LOOPS=1
 )
 
 project(tester)
