@@ -32,7 +32,8 @@ private:
 
         static void logRequest() {
 		reqs++;
-		size_t secs = Time::diff(tp, Time::now());
+		Time::timePoint now = Time::now();
+		size_t secs = Time::diff(tp, now).count();
 		std::cout << "\rAvg RPS: " << ;
 	}
 
