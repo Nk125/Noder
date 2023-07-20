@@ -34,7 +34,7 @@ private:
 		reqs++;
 		Time::timePoint now = Time::now();
 		float secs = (Time::diff(Timer::tp, now).count()) / 1000;
-		if (secs % 15 == 0) {
+		if ((secs % float(15)) == 0) {
 			std::cout << "\rAvg RPS: " << float(float(reqs) / float(secs));
 		}
 	}
