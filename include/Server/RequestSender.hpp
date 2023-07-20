@@ -33,7 +33,7 @@ private:
         static void logRequest() {
 		reqs++;
 		Time::timePoint now = Time::now();
-		size_t secs = (Time::diff(Timer::tp, now).count() / 1000);
+		float secs = (Time::diff(Timer::tp, now).count()) / 1000;
 		if (secs % 15 == 0) {
 			std::cout << "\rAvg RPS: " << float(float(reqs) / float(secs));
 		}
