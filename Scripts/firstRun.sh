@@ -27,6 +27,13 @@ scriptdir="$(pwd)/Scripts"
 chmod +x *.sh 1>/dev/null 2>&1
 cd "${basedir}"
 
+curl --version 1>/dev/null 2>&1
+
+if [[ $? != 0 ]]; then
+    echo "Installing Curl"
+    nix-env -iA nixpkgs.curl
+fi
+
 getScript() {
     "${scriptdir}/$1" 1>/dev/null 2>&1
 
@@ -102,6 +109,13 @@ copyReplFiles() {
 copyReplFiles "../.."
 
 copyReplFiles "${basedir}"
+
+cmake --version 1>/dev/null 2>&1
+
+if [[ $? != 0 ]]; then
+    echo "Installing CMake"
+    nix-env -iA nixpkgs.cmake
+fi
 
 echo "Running compiler script"
 

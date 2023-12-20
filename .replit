@@ -1,7 +1,5 @@
 compile = "'PATH_TO_SCRIPTS/run.sh' compile 'BUILD_PATH' 'SOURCE_DIR'"
 run = "'PATH_TO_SCRIPTS/run.sh' run 'BUILD_PATH'"
-entrypoint = "main.cpp"
-hidden = ["main", "**/*.o", "**/*.d", ".ccls-cache"]
 
 [nix]
 channel = "stable-22_11"
