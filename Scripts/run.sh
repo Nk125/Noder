@@ -3,7 +3,11 @@ sourceDir="$(! [ "$3" = "" ] && echo $3 || echo "Noder/Node")"
 
 case $1 in
 compile)
-./getNoder.sh update
+scriptdir="$(dirname $0)"
+"${scriptdir}/getNoder.sh" update
+if [[ $? != 0 ]]; then
+    echo "Failed to update repo, compiling anyway"
+fi
 mkdir "${buildPath}" 1>/dev/null 2>&1
 cmake -B "${buildPath}" -S "${sourceDir}"
 cmake --build "${buildPath}" --target node

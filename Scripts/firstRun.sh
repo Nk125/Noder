@@ -93,7 +93,8 @@ copyReplFiles() {
 
         echo "Copying replit files to: ${curDir}"
 
-        cp "${prevDir}/*replit*" "${curDir}"
+        cp "${prevDir}/replit.nix" "${curDir}"
+        cp "${prevDir}/.replit" "${curDir}"
         cd "${prevDir}"
     fi
 }
