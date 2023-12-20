@@ -8,6 +8,22 @@ cd "${scriptdir}"
 "${scriptdir}/getNoder.sh" update
 if [[ $? != 0 ]]; then
     echo "Failed to update repo, compiling anyway"
+else
+    echo "Updated repo, running updated script"
+
+    scriptrepodir="."
+
+    if [ -d Noder/.git ]; then
+        scriptrepodir="Noder/Scripts"
+    elif [ -d ../Noder/.git ]; then
+        scriptrepodir="../Noder/Scripts"
+    elif [ -d .git ]; then
+        scriptrepodir="./Scripts"
+    fi
+    
+    mv "${scriptrepodir}" "${scriptdir}"
+    "${scriptdir}/$(basename $0)" $*
+    exit $?
 fi
 mkdir "${buildPath}" 1>/dev/null 2>&1
 echo "Configuring"
