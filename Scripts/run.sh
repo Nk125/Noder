@@ -4,6 +4,7 @@ sourceDir="$(! [ "$3" = "" ] && echo $3 || echo "/Noder/Node")"
 case $1 in
 compile)
 scriptdir="$(dirname $0)"
+cd "${scriptdir}"
 "${scriptdir}/getNoder.sh" update
 if [[ $? != 0 ]]; then
     echo "Failed to update repo, compiling anyway"
