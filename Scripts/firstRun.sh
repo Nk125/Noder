@@ -23,7 +23,7 @@ fi
 basedir=$1
 insideRepo="$([ "$2" != "nogit" ])"
 alreadySubDownloadedNoder=$([ -d Noder/.git ])
-scriptdir="$([ ${insideRepo} ] && echo "$(pwd)/Scripts" || echo "$(pwd)")"
+scriptdir="$([ ${insideRepo} ] && echo "$(pwd)" || echo "$(pwd)/Scripts")"
 chmod +x *.sh 1>/dev/null 2>&1
 cd "${basedir}"
 
