@@ -29,9 +29,10 @@ void start() {
 		std::cout << "Obtained current time\n";
 		std::cout << "Listening.\n";
 
-		int port = sv.bind_to_any_port("0.0.0.0");
+		int port = 80;
+
 		std::cout << "Designed Port: " << port << "\n";
-		sv.listen_after_bind();
+		sv.listen("0.0.0.0", port);
 	}
 	catch (...) {
 		std::cerr << "Failed at some point of the binding/listening\n";

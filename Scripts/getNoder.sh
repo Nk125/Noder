@@ -16,8 +16,8 @@ echo "Updating..."
 if ! [ -d ".git" ] && [ -d "../Noder/.git" ]; then
 	echo "Moving to Noder..."
 	cd ../Noder
-else
-	echo "Couldn't detect a valid git repository"
+elif ! [ -d ".git" ] && ! [ -d "../Noder/.git" ]; then
+    echo "Couldn't detect a valid git repository"
 	exit 1
 fi
 
