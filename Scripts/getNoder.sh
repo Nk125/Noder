@@ -13,7 +13,7 @@ echo "Finished clone"
 update)
 echo "Updating..."
 
-if ! [[ -d .git ]] && [[ -d ../Noder/.git ]]; then
+if ! [ -d ".git" ] && [ -d "../Noder/.git" ]; then
 	echo "Moving to Noder..."
 	cd ../Noder
 else

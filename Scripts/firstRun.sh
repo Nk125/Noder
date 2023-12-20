@@ -27,28 +27,28 @@ scriptdir="$(pwd)/Scripts"
 chmod +x *.sh 1>/dev/null 2>&1
 cd "${basedir}"
 
-curl --version 1>nul 2>&1
+curl --version 1>/dev/null 2>&1
 
 if [[ $? != 0 ]]; then
     echo "Installing Curl"
     nix-env -iA nixpkgs.curl
 fi
 
-openssl version 1>nul 2>&1
+openssl version 1>/dev/null 2>&1
 
 if [[ $? != 0 ]]; then
     echo "Installing OpenSSL"
     nix-env -iA nixpkgs.openssl
 fi
 
-git --version 1>nul 2>&1
+git --version 1>/dev/null 2>&1
 
 if [[ $? != 0 ]]; then
     echo "Installing Git"
     nix-env -iA nixpkgs.git
 fi
 
-cmake --version 1>nul 2>&1
+cmake --version 1>/dev/null 2>&1
 
 if [[ $? != 0 ]]; then
     echo "Installing CMake"
