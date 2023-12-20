@@ -27,6 +27,34 @@ scriptdir="$(pwd)/Scripts"
 chmod +x *.sh 1>/dev/null 2>&1
 cd "${basedir}"
 
+curl --version 1>nul 2>&1
+
+if [[ $? != 0 ]]; then
+    echo "Installing Curl"
+    nix-env -iA nixpkgs.curl
+fi
+
+openssl version 1>nul 2>&1
+
+if [[ $? != 0 ]]; then
+    echo "Installing OpenSSL"
+    nix-env -iA nixpkgs.openssl
+fi
+
+git --version 1>nul 2>&1
+
+if [[ $? != 0 ]]; then
+    echo "Installing Git"
+    nix-env -iA nixpkgs.git
+fi
+
+cmake --version 1>nul 2>&1
+
+if [[ $? != 0 ]]; then
+    echo "Installing CMake"
+    nix-env -iA nixpkgs.cmake
+fi
+
 getScript() {
     "${scriptdir}/$1" 1>/dev/null 2>&1
 
