@@ -1,5 +1,5 @@
 buildPath="$(! [ "$2" = "" ] && echo $2 || echo "build")"
-sourceDir="$(! [ "$3" = "" ] && echo $3 || echo "Noder/Node")"
+sourceDir="$(! [ "$3" = "" ] && echo $3 || echo "/Noder/Node")"
 
 case $1 in
 compile)
@@ -9,7 +9,9 @@ if [[ $? != 0 ]]; then
     echo "Failed to update repo, compiling anyway"
 fi
 mkdir "${buildPath}" 1>/dev/null 2>&1
+echo "Configuring"
 cmake -B "${buildPath}" -S "${sourceDir}"
+echo "Building"
 cmake --build "${buildPath}" --target node
 echo "Built"
 ;;
