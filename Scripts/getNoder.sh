@@ -13,9 +13,9 @@ echo "Finished clone"
 update)
 echo "Updating..."
 
-if ! [[ -d .git ]] && [[ -d Noder/.git ]]; then
+if ! [[ -d .git ]] && [[ -d ../Noder/.git ]]; then
 	echo "Moving to Noder..."
-	cd Noder
+	cd ../Noder
 else
 	echo "Couldn't detect a valid git repository"
 	exit 1

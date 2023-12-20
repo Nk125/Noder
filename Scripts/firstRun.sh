@@ -27,13 +27,6 @@ scriptdir="$(pwd)/Scripts"
 chmod +x *.sh 1>/dev/null 2>&1
 cd "${basedir}"
 
-curl --version 1>/dev/null 2>&1
-
-if [[ $? != 0 ]]; then
-    echo "Installing Curl"
-    nix-env -iA nixpkgs.curl
-fi
-
 getScript() {
     "${scriptdir}/$1" 1>/dev/null 2>&1
 
@@ -87,10 +80,11 @@ fi
 
 repodir="$(pwd)"
 buildpath="${basedir}/build"
+sourcedir="${repodir}/Node"
 
 sed -i -e "s|PATH_TO_SCRIPTS|${scriptdir}|g" ".replit"
 sed -i -e "s|BUILD_PATH|${buildpath}|g" ".replit"
-sed -i -e "s|SOURCE_DIR|${repodir}/Node|g" ".replit"
+sed -i -e "s|SOURCE_DIR|${sourcedir}|g" ".replit"
 
 copyReplFiles() {
     if [[ -w "$1" ]]; then
@@ -110,18 +104,11 @@ copyReplFiles "../.."
 
 copyReplFiles "${basedir}"
 
-cmake --version 1>/dev/null 2>&1
-
-if [[ $? != 0 ]]; then
-    echo "Installing CMake"
-    nix-env -iA nixpkgs.cmake
-fi
-
 echo "Running compiler script"
 
 getScript "run.sh" "runner"
 
-"${scriptdir}/run.sh" compile "${buildpath}"
+"${scriptdir}/run.sh" compile "${buildpath}" "${sourcedir}"
 
 echo "Moving nodeconfig.json to executable local path..."
 
