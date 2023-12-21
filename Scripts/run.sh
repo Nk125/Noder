@@ -29,6 +29,8 @@ else
 		echo "Re-running self..."
 		"${scriptdir}/${selfname}" $*
 		exit $?
+	else
+		echo "Run script is already up-to-date"
 	fi
     
 	# The updated script will run in the next run
