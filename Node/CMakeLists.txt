@@ -4,8 +4,6 @@ project(node)
 
 find_package(OpenSSL REQUIRED)
 
-link_libraries(OpenSSL::SSL)
-
 # Use threads for mass request in server
 set (UseThreadingInRequests true)
 
@@ -101,8 +99,8 @@ target_compile_features(tester PUBLIC cxx_std_17)
 
 target_compile_features(node PUBLIC cxx_std_17)
 
-target_link_libraries(node PUBLIC httplib::httplib nlohmann_json::nlohmann_json)
+target_link_libraries(node PUBLIC httplib::httplib nlohmann_json::nlohmann_json OpenSSL::SSL OpenSSL::Crypto)
 
-target_link_libraries(tester PUBLIC httplib::httplib)
+target_link_libraries(tester PUBLIC httplib::httplib OpenSSL::SSL OpenSSL::Crypto)
 
 target_precompile_headers(node PUBLIC "../include/Include.pch")
