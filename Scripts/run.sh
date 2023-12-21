@@ -37,7 +37,7 @@ else
 fi
 mkdir "${buildPath}" 1>/dev/null 2>&1
 echo "Configuring"
-cmake -B "${buildPath}" -S "${sourceDir}" -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_FLAGS="-fuse-ld=lld"
+cmake -B "${buildPath}" -S "${sourceDir}" -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_FLAGS="-fuse-ld=gold" -G "Ninja"
 echo "Building"
 cmake --build "${buildPath}" --target node
 echo "Built"

@@ -62,11 +62,11 @@ if [[ $? != 0 ]]; then
     nix-env -iA nixpkgs.ccache
 fi
 
-ld.lld --version 1>/dev/null 2>&1
+ninja --version 1>/dev/null 2>&1
 
 if [[ $? != 0 ]]; then
-    echo "Installing LLD 13"
-    nix-env -iA nixpkgs.lld_13
+    echo "Installing Ninja"
+    nix-env -iA nixpkgs.ninja
 fi
 
 getScript() {
