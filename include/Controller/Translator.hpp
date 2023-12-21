@@ -1,6 +1,6 @@
 #pragma once
 #include <Controller/Defines.hpp>
-#include <json.hpp>
+#include <nlohmann/json.hpp>
 #include <string>
 
 class Translator {

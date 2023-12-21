@@ -1,5 +1,10 @@
-#define CPPHTTPLIB_OPENSSL_SUPPORT
-#include "Include.pch"
+//	Automatically added by CMake
+//#define CPPHTTPLIB_OPENSSL_SUPPORT
+#include <Include.pch>
+#include <Server/Config.hpp>
+#include <Server/RequestHandler.hpp>
+#include <Server/Threading.hpp>
+#include <Server/Time.hpp>
 
 // clear && clang++ -O1 -pthread -lssl -lcrypto -std=c++17 -o ./main main.cpp &&
 // ./main

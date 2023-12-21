@@ -1,0 +1,23 @@
+#ifndef INCLUDE_PCH
+#define INCLUDE_PCH
+
+// Standard C++
+#include <algorithm>
+#include <cctype>
+#include <chrono>
+#include <fstream>
+#include <functional>
+#include <iostream>
+#include <memory>
+#include <regex>
+#include <string>
+#include <thread>
+
+// External Dependencies
+#include <BS_thread_pool.hpp>
+#include <httplib.h>
+#include <nlohmann/json.hpp>
+
+// Self
+#include <PATHS.h>
+#endif

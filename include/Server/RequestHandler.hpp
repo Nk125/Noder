@@ -1,14 +1,9 @@
 #pragma once
-#include <httplib.h>
-#include <json.hpp>
-#include <PATHS.h>
+#include <Include.pch>
 #include <Server/Config.hpp>
 #include <Server/RequestSender.hpp>
 #include <Server/Threading.hpp>
 #include <Server/Time.hpp>
-#if !USE_THREAD_POOL
-#include <thread>
-#endif
 
 class RequestHandler {
 private:
@@ -110,11 +105,11 @@ private:
 			std::cout << "New requester: GET to " << url << " id: " << Threading::id << "\n";
 
 			RequestSender::stopThreads = false;
-			
+
 			for (size_t i = 0; i < REQUESTER_LOOPS; i++) {
-				#if USE_THREAD_POOL_FOR_INIT
+#if USE_THREAD_POOL_FOR_INIT
 				Threading::threader->push_task(RequestSender::getHTTPRequest, url, config);
-				#else
+#else
 				try {
 					std::thread(RequestSender::getHTTPRequest, url, config).detach();
 				}
@@ -122,7 +117,7 @@ private:
 					genericError(res, "Failed to detach thread", Error::Thread, 500);
 					return;
 				}
-				#endif
+#endif
 			}
 
 			genericResponse(res, "Ok, initialized GET requester");
@@ -163,9 +158,9 @@ private:
 			RequestSender::stopThreads = false;
 
 			for (size_t i = 0; i < REQUESTER_LOOPS; i++) {
-				#if USE_THREAD_POOL_FOR_INIT
+#if USE_THREAD_POOL_FOR_INIT
 				Threading::threader->push_task(RequestSender::postHTTPRequest, url, config);
-				#else
+#else
 				try {
 					std::thread(RequestSender::postHTTPRequest, url, config).detach();
 				}
@@ -173,7 +168,7 @@ private:
 					genericError(res, "Failed to detach thread", Error::Thread, 500);
 					return;
 				}
-				#endif
+#endif
 			}
 
 			genericResponse(res, "Ok, initialized POST requester");

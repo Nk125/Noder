@@ -1,24 +1,15 @@
 #pragma once
 #include <Server/Time.hpp>
-#include <httplib.h>
 #include <parser.hpp>
-#include <json.hpp>
-#if ENABLE_REGEX_IN_POST_REQUESTS
-#include <regex>
-#endif
-#if USE_THREAD_POOL_FOR_REQUESTER
-#include <Server/Threading.hpp>
-#else
-#include <thread>
-#endif
+#include <Include.pch>
 
 namespace Timer {
-        Time::timePoint tp;
+	Time::timePoint tp;
 }
 
 class RequestSender {
 private:
-        static std::atomic<size_t> reqs;
+	static std::atomic<size_t> reqs;
 
 	static std::string genRanStr(const size_t len) {
 		std::random_device rd;
@@ -30,7 +21,7 @@ private:
 		return buf;
 	}
 
-        static void logRequest() {
+	static void logRequest() {
 		reqs++;
 		Time::timePoint now = Time::now();
 		float secs = (Time::diff(Timer::tp, now).count()) / 1000;
@@ -39,12 +30,12 @@ private:
 		}
 	}
 
-        static void setupLogger() {
+	static void setupLogger() {
 		reqs = 0;
 		Timer::tp = Time::now();
 	}
 
-	#if ENABLE_REGEX_IN_POST_REQUESTS
+#if ENABLE_REGEX_IN_POST_REQUESTS
 	static void regenBody(std::string& body, std::string originalBody) {
 		{
 			body.clear();
@@ -65,7 +56,7 @@ private:
 			body.append(originalBody);
 		}
 	}
-	#endif
+#endif
 
 	static void request(std::string url, std::string path, httplib::Headers h, bool post = false, std::string body = "", std::string ctype = "") {
 		httplib::Client c(url);
@@ -104,26 +95,26 @@ public:
 		std::string finalurl = (u.protocol_.empty() ? "http" : u.protocol_) + "://" + u.host_, finalpath = (u.path_.empty() ? "/" : u.path_) + (u.query_.empty() ? "" : "?" + u.query_);
 
 		while (!stopThreads) {
-			#if USE_THREADING_IN_REQUESTS
-            try {
-				#if USE_THREAD_POOL_FOR_REQUESTER
-                Threading::threader->push_task
-				#else
+#if USE_THREADING_IN_REQUESTS
+			try {
+#if USE_THREAD_POOL_FOR_REQUESTER
+				Threading::threader->push_task
+#else
 				std::thread t
-				#endif
+#endif
 
-				(RequestSender::request, finalurl, finalpath, h, false, std::string(""), std::string(""));
+					(RequestSender::request, finalurl, finalpath, h, false, std::string(""), std::string(""));
 
-				#if !USE_THREAD_POOL_FOR_REQUESTER
+#if !USE_THREAD_POOL_FOR_REQUESTER
 				t.detach();
-				#endif
-            }
-            catch (...) {
-                continue;
-            }
-			#else
+#endif
+			}
+			catch (...) {
+				continue;
+			}
+#else
 			RequestSender::request(finalurl, finalpath, h);
-			#endif
+#endif
 
 			logRequest();
 		}
@@ -132,11 +123,11 @@ public:
 	static void postHTTPRequest(std::string uri, nlohmann::json config) {
 		setupLogger();
 		urlparser u(uri);
-		
+
 		if (u.host_.empty()) return;
 
 		u.ctype_ = config[std::to_string(ContentType)];
-		u.body_	= config[std::to_string(Body)];
+		u.body_ = config[std::to_string(Body)];
 
 		std::string body, finalurl = (u.protocol_.empty() ? "http" : u.protocol_) + "://" + u.host_, finalpath = (u.path_.empty() ? "/" : u.path_) + (u.query_.empty() ? "" : "?" + u.query_);
 
@@ -146,39 +137,39 @@ public:
 
 		bool useRgx = config[std::to_string(UseRegex)];
 
-		#if !ENABLE_REGEX_IN_POST_REQUESTS
+#if !ENABLE_REGEX_IN_POST_REQUESTS
 		if (!useRgx) {
 			body = u.body_;
 		}
-		#endif
+#endif
 
 		while (!stopThreads) {
-			#if ENABLE_REGEX_IN_POST_REQUESTS
+#if ENABLE_REGEX_IN_POST_REQUESTS
 			if (useRgx) {
 				regenBody(body, u.body_);
 			}
-			#endif
+#endif
 
-			#if USE_THREADING_IN_REQUESTS
-            try {
-				#if USE_THREAD_POOL_FOR_REQUESTER
-                Threading::threader->push_task
-				#else
+#if USE_THREADING_IN_REQUESTS
+			try {
+#if USE_THREAD_POOL_FOR_REQUESTER
+				Threading::threader->push_task
+#else
 				std::thread t
-				#endif
+#endif
 
-				(RequestSender::request, finalurl, finalpath, h, true, body, u.ctype_);
+					(RequestSender::request, finalurl, finalpath, h, true, body, u.ctype_);
 
-				#if !USE_THREAD_POOL_FOR_REQUESTER
+#if !USE_THREAD_POOL_FOR_REQUESTER
 				t.detach();
-				#endif
-            }
-            catch (...) {
-                continue;
-            }
-			#else
+#endif
+			}
+			catch (...) {
+				continue;
+			}
+#else
 			RequestSender::request(finalurl, finalpath, h, true, body, u.ctype_);
-			#endif
+#endif
 
 			logRequest();
 		}

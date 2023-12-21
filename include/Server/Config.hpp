@@ -1,6 +1,5 @@
 #pragma once
-#include <fstream>
-#include <json.hpp>
+#include <Include.pch>
 
 namespace Configuration {
     nlohmann::json config;

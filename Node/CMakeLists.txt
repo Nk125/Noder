@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 3.19)
 
 project(node)
 
@@ -23,6 +23,16 @@ set (UseThreadPoolForInit false)
 # POST Requests have a "function" made with regex that fills some data with random characters, but waste too much performance so this is setal
 set (EnableRegexInPostRequests false)
 
+message(STATUS "Configuration:")
+
+message(STATUS "Use Threading in Requests: ${UseThreadingInRequests}")
+
+message(STATUS "Use thread pool For Requester: ${UseThreadPoolForRequester}")
+
+message(STATUS "Use thread pool for init: ${UseThreadPoolForInit}")
+
+message(STATUS "Enable Regex in Post Requests: ${EnableRegexInPostRequests}")
+
 add_executable(node "main.cpp")
 
 target_compile_definitions(node PUBLIC 
@@ -34,7 +44,50 @@ target_compile_definitions(node PUBLIC
     REQUESTER_LOOPS=1
 )
 
-target_precompile_headers(node PUBLIC "Include.pch")
+set (FETCHCONTENT_UPDATES_DISCONNECTED ON)
+
+include(FetchContent)
+
+FetchContent_Declare(httplibgit
+    GIT_REPOSITORY "https://github.com/yhirose/cpp-httplib"
+    GIT_TAG "master"
+    GIT_SHALLOW true
+)
+
+message(STATUS "Populating cpp-httplib")
+
+FetchContent_MakeAvailable(httplibgit)
+
+message(STATUS "Finished")
+
+FetchContent_Declare(jsongit
+    URL "https://github.com/nlohmann/json/releases/download/v3.11.3/json.tar.xz"
+    DOWNLOAD_EXTRACT_TIMESTAMP true
+)
+
+message(STATUS "Downloading nlohmann::json v3.11.3")
+
+FetchContent_MakeAvailable(jsongit)
+
+message(STATUS "Finished")
+
+FetchContent_Declare(tpgit
+    GIT_REPOSITORY "https://github.com/bshoshany/thread-pool"
+    GIT_TAG "master"
+    GIT_SHALLOW true
+)
+
+message(STATUS "Populating BS::Thread Pool")
+
+FetchContent_GetProperties(tpgit)
+
+if (NOT ${tpgit_POPULATED})
+    FetchContent_Populate(tpgit)
+endif()
+
+target_include_directories(node PUBLIC "${tpgit_SOURCE_DIR}/include")
+
+message(STATUS "Finished")
 
 project(tester)
 
@@ -42,6 +95,14 @@ add_executable(tester "testDDoS.cpp")
 
 target_include_directories(tester PUBLIC "../include")
 
+target_include_directories(node PUBLIC "../include")
+
 target_compile_features(tester PUBLIC cxx_std_17)
 
 target_compile_features(node PUBLIC cxx_std_17)
+
+target_link_libraries(node PUBLIC httplib::httplib nlohmann_json::nlohmann_json)
+
+target_link_libraries(tester PUBLIC httplib::httplib)
+
+target_precompile_headers(node PUBLIC "../include/Include.pch")

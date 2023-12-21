@@ -21,7 +21,7 @@ int main(int argc, char* argv[]) {
         return 0;
     }
 
-    host.assign((argc == 2 ? std::string("127.0.0.1") : std::string(argv[2])));
+    host.assign((argc <= 2 ? std::string("127.0.0.1") : std::string(argv[2])));
 
     port = std::stoi(argv[1]);
 
@@ -48,7 +48,7 @@ int main(int argc, char* argv[]) {
         " (Global: " + std::to_string(requests["GET"] + requests["POST"]) + ")", "text/plain");
     });
 
-    std::cout << "Listening at port: " << port << "\n";
+    std::cout << "Listening at: " << host << ":" << port << "\n";
 
     if (!sv.listen(host, port)) {
         std::cout << "Failed at listen\n";

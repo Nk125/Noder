@@ -1,5 +1,5 @@
 #pragma once
-#include <chrono>
+#include <Include.pch>
 
 namespace Time {
 	typedef std::chrono::time_point<std::chrono::high_resolution_clock> timePoint;
