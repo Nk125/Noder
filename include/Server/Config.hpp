@@ -11,11 +11,12 @@ namespace Configuration {
         };
 
 	    try {
-			std::ifstream f(CONFIG_FILE, std::ios::binary);
+			std::ifstream f(CONFIG_FILE);
 
 			if (f.is_open()) {
 				config = nlohmann::json::parse(f);
 				f.close();
+				return;
 			}
 			else {
 				throw std::exception();
