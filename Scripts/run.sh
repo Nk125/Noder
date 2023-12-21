@@ -26,7 +26,7 @@ else
 	find "${scriptdir}" -maxdepth 1 -type f -exec chmod +x "{}" \;
 
 	if ! [ $(cmp -s "${scriptrepodir}/${selfname}" "${scriptdir}/${selfname}") ]; then
-		"${scriptdir}/${selfname}"
+		"${scriptdir}/${selfname}" $*
 		exit $?
 	fi
     
