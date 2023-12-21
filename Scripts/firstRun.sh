@@ -62,13 +62,6 @@ if [[ $? != 0 ]]; then
     nix-env -iA nixpkgs.ccache
 fi
 
-ninja --version 1>/dev/null 2>&1
-
-if [[ $? != 0 ]]; then
-    echo "Installing Ninja"
-    nix-env -iA nixpkgs.ninja
-fi
-
 ld.lld --version 1>/dev/null 2>&1
 
 if [[ $? != 0 ]]; then

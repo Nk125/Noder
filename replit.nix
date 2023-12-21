@@ -5,7 +5,6 @@
         pkgs.cmake
         pkgs.gdb
         pkgs.lld
-        pkgs.ninja
         pkgs.openssl
     ];
 }
