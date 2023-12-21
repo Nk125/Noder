@@ -7,23 +7,24 @@ scriptdir="$(dirname $0)"
 cd "${scriptdir}"
 "${scriptdir}/getNoder.sh" update
 if [[ $? != 0 ]]; then
-    echo "Failed to update repo, compiling anyway"
+	echo "Failed to update repo, compiling anyway"
 else
-    echo "Updated repo, running updated script"
+	echo "Updated repo, running updated script"
 
-    scriptrepodir="."
+	scriptrepodir="."
 
-    if [ -d Noder/.git ]; then
-        scriptrepodir="Noder/Scripts"
-    elif [ -d ../Noder/.git ]; then
-        scriptrepodir="../Noder/Scripts"
-    elif [ -d .git ]; then
-        scriptrepodir="./Scripts"
-    fi
+	if [ -d Noder/.git ]; then
+		scriptrepodir="Noder/Scripts"
+	elif [ -d ../Noder/.git ]; then
+		scriptrepodir="../Noder/Scripts"
+	elif [ -d .git ]; then
+		scriptrepodir="./Scripts"
+	fi
 
-    find "${scriptrepodir}" -maxdepth 1 -type f -exec cp -f "{}" "${scriptdir}" \;
+	find "${scriptrepodir}" -maxdepth 1 -type f -exec cp -f "{}" "${scriptdir}" \;
+	find "${scriptdir}" -maxdepth 1 -type f -exec chmod +x "{}" \;
 
-    # The updated script will run in the next run
+	# The updated script will run in the next run
 fi
 mkdir "${buildPath}" 1>/dev/null 2>&1
 echo "Configuring"

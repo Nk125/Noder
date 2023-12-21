@@ -4,7 +4,7 @@
 		pkgs.ccls
 		pkgs.gdb
 		pkgs.gnumake
-        pkgs.openssl
-        pkgs.cmake
+		pkgs.openssl
+		pkgs.cmake
 	];
 }
