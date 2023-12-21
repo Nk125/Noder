@@ -20,9 +20,15 @@ else
     elif [ -d .git ]; then
         scriptrepodir="./Scripts"
     fi
-    
-    cp -rf "${scriptrepodir}" ".."
-    "${scriptdir}/$(basename $0)" $*
+
+    for f in "${scriptrepodir}"; do
+        for g in "${scriptdir}"; do
+            echo "$f $g"
+            if ! [ cmp -s "$f" "$g" ] && "$(basename $f)" = "$(basename $g)"; then
+                cp -f "$f" "$g"
+            fi
+        done
+    done
     
     exit $?
 fi
