@@ -69,11 +69,11 @@ if [[ $? != 0 ]]; then
     nix-env -iA nixpkgs.ninja
 fi
 
-clang-12 --version 1>/dev/null 2>&1
+ld.lld --version 1>/dev/null 2>&1
 
 if [[ $? != 0 ]]; then
-    echo "Installing Clang-12"
-    nix-env -iA nixpkgs.clang_12
+    echo "Installing LLD 13"
+    nix-env -iA nixpkgs.lld_13
 fi
 
 getScript() {

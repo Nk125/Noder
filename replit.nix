@@ -2,9 +2,9 @@
     deps = [
         pkgs.ccache
         pkgs.ccls
-        pkgs.clang_12
         pkgs.cmake
         pkgs.gdb
+        pkgs.lld
         pkgs.ninja
         pkgs.openssl
     ];
