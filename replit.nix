@@ -1,11 +1,12 @@
 { pkgs }: {
-	deps = [
-		pkgs.clang_12
-		pkgs.ccls
-		pkgs.ccache
-		pkgs.gdb
-		pkgs.gnumake
-		pkgs.openssl
-		pkgs.cmake
-	];
+    deps = [
+        pkgs.ccache
+        pkgs.ccls
+        pkgs.clang_12
+        pkgs.cmake
+        pkgs.gdb
+        pkgs.mold
+        pkgs.ninja
+        pkgs.openssl
+    ];
 }

@@ -62,6 +62,20 @@ if [[ $? != 0 ]]; then
     nix-env -iA nixpkgs.ccache
 fi
 
+ninja --version 1>/dev/null 2>&1
+
+if [[ $? != 0 ]]; then
+    echo "Installing Ninja"
+    nix-env -iA nixpkgs.ninja
+fi
+
+mold --version 1>/dev/null 2>&1
+
+if [[ $? != 0 ]]; then
+    echo "Installing Mold"
+    nix-env -iA nixpkgs.mold
+fi
+
 getScript() {
     "${scriptdir}/$1" 1>/dev/null 2>&1
 
