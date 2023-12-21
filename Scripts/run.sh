@@ -21,16 +21,9 @@ else
         scriptrepodir="./Scripts"
     fi
 
-    for f in "${scriptrepodir}"; do
-        for g in "${scriptdir}"; do
-            echo "$f $g"
-            if ! [ cmp -s "$f" "$g" ] && "$(basename $f)" = "$(basename $g)"; then
-                cp -f "$f" "$g"
-            fi
-        done
-    done
-    
-    exit $?
+    find "${scriptrepodir}" -maxdepth 1 -type f -exec cp -f "{}" "${scriptdir}" \;
+
+    # The updated script will run in the next run
 fi
 mkdir "${buildPath}" 1>/dev/null 2>&1
 echo "Configuring"
