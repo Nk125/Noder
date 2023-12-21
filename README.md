@@ -30,7 +30,7 @@ cd Noder
 # Else if you don't have git you can download it manually from github, as the build process is the same!
 mkdir build
 cmake -B build -S Controller
-cmake --build
+cmake --build build --target node
 # Run:
 ./build/controller
 ```
