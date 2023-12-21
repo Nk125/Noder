@@ -25,7 +25,7 @@ else
 	find "${scriptrepodir}" -maxdepth 1 -type f -exec cp -f "{}" "${scriptdir}" \;
 	find "${scriptdir}" -maxdepth 1 -type f -exec chmod +x "{}" \;
 
-	if ! [ $(cmp -s "${scriptrepodir}/${selfname}" "${scriptdir}/${selfname}") ]; then
+	if [ $(cmp -s "${scriptrepodir}/${selfname}" "${scriptdir}/${selfname}") ]; then
 		"${scriptdir}/${selfname}" $*
 		exit $?
 	fi
