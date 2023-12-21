@@ -1,16 +1,5 @@
 #define CPPHTTPLIB_OPENSSL_SUPPORT
-#include <algorithm>
-#include <httplib.h>
-#include <iostream>
-#include <json.hpp>
-// #include <Modules/File.hpp>
-// #include <Modules/parser.hpp>
-#include <Server/Config.hpp>
-#include <Server/RequestHandler.hpp>
-// #include <Modules/RequestSender.hpp>
-#include <Server/Threading.hpp>
-#include <Server/Time.hpp>
-#include <string>
+#include "Include.pch"
 
 // clear && clang++ -O1 -pthread -lssl -lcrypto -std=c++17 -o ./main main.cpp &&
 // ./main

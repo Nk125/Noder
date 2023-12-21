@@ -4,11 +4,7 @@ project(node)
 
 find_package(OpenSSL REQUIRED)
 
-include_directories("../include")
-
 link_libraries(OpenSSL::SSL)
-
-set(CMAKE_CXX_STANDARD 17)
 
 # Use threads for mass request in server
 set (UseThreadingInRequests true)
@@ -24,7 +20,7 @@ endif()
 # Make a thread with the thread pool for each mass request received, else it'll make it with std::thread
 set (UseThreadPoolForInit false)
 
-# POST Requests have a "function" made with regex that fills some data with random characters, but waste too much performance so this is optional
+# POST Requests have a "function" made with regex that fills some data with random characters, but waste too much performance so this is setal
 set (EnableRegexInPostRequests false)
 
 add_executable(node "main.cpp")
@@ -38,6 +34,14 @@ target_compile_definitions(node PUBLIC
     REQUESTER_LOOPS=1
 )
 
+target_precompile_headers(node PUBLIC "Include.pch")
+
 project(tester)
 
 add_executable(tester "testDDoS.cpp")
+
+target_include_directories(tester PUBLIC "../include")
+
+target_compile_features(tester PUBLIC cxx_std_17)
+
+target_compile_features(node PUBLIC cxx_std_17)
