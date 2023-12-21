@@ -76,6 +76,13 @@ if [[ $? != 0 ]]; then
     nix-env -iA nixpkgs.mold
 fi
 
+clang-12 --version 1>/dev/null 2>&1
+
+if [[ $? != 0 ]]; then
+    echo "Installing Clang-12"
+    nix-env -iA nixpkgs.clang_12
+fi
+
 getScript() {
     "${scriptdir}/$1" 1>/dev/null 2>&1
 
