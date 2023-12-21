@@ -21,8 +21,9 @@ else
         scriptrepodir="./Scripts"
     fi
     
-    mv "${scriptrepodir}" "${scriptdir}"
+    cp -rf "${scriptrepodir}" ".."
     "${scriptdir}/$(basename $0)" $*
+    
     exit $?
 fi
 mkdir "${buildPath}" 1>/dev/null 2>&1
