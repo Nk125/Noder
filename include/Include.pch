@@ -14,7 +14,6 @@
 #include <thread>
 
 // External Dependencies
-#include <BS_thread_pool.hpp>
 #include <httplib.h>
 #include <nlohmann/json.hpp>
 

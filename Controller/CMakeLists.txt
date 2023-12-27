@@ -22,6 +22,18 @@ FetchContent_MakeAvailable(httplibgit)
 
 message(STATUS "Finished")
 
+FetchContent_Declare(ranggit
+    GIT_REPOSITORY "https://github.com/agauniyal/rang"
+    GIT_TAG "master"
+    GIT_SHALLOW true
+)
+
+message(STATUS "Populating rang")
+
+FetchContent_MakeAvailable(ranggit)
+
+message(STATUS "Finished")
+
 FetchContent_Declare(jsongit
     URL "https://github.com/nlohmann/json/releases/download/v3.11.3/json.tar.xz"
     DOWNLOAD_EXTRACT_TIMESTAMP true
@@ -37,4 +49,4 @@ add_executable(node_controller "main.cpp")
 
 target_include_directories(node_controller PUBLIC "../include")
 
-target_link_libraries(node_controller PUBLIC OpenSSL::SSL OpenSSL::Crypto httplib::httplib nlohmann_json::nlohmann_json)
+target_link_libraries(node_controller PUBLIC OpenSSL::SSL OpenSSL::Crypto httplib::httplib nlohmann_json::nlohmann_json rang)

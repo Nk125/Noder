@@ -4,22 +4,21 @@ project(node)
 
 find_package(OpenSSL REQUIRED)
 
-# Use threads for mass request in server
-set (UseThreadingInRequests true)
+option(UseThreadingInRequests "Use threads for mass request in server" ON)
 
 if (UseThreadingInRequests) 
-    # Use the thread pool for requests (This consumes too much RAM, i usually set this to false)
-    set (UseThreadPoolForRequester false)
-else()
-    # Don't touch here, if you set it to true it has no effect, it's just to fill the var
-    set (UseThreadPoolForRequester false)
+    # This consumes too much RAM, i usually set this to OFF
+    option(UseThreadPoolForRequester "Use the thread pool for requests" OFF)
 endif()
 
 # Make a thread with the thread pool for each mass request received, else it'll make it with std::thread
-set (UseThreadPoolForInit false)
+option(UseThreadPoolForInit "Submit a task to the TP for each mass request" ON)
 
-# POST Requests have a "function" made with regex that fills some data with random characters, but waste too much performance so this is setal
-set (EnableRegexInPostRequests false)
+# POST Requests have a "function" made with regex that fills some data with random characters
+# but regex itself waste too much resources, defaultly set as OFF
+option(EnableRegexInPostRequests "Enable regex in POST Requests" OFF)
+
+set(ConfigFilePath "./nodeconfig.json")
 
 message(STATUS "Configuration:")
 
@@ -31,18 +30,21 @@ message(STATUS "Use thread pool for init: ${UseThreadPoolForInit}")
 
 message(STATUS "Enable Regex in Post Requests: ${EnableRegexInPostRequests}")
 
+message(STATUS "Config File Path: ${ConfigFilePath}")
+
 add_executable(node "main.cpp")
 
 target_compile_definitions(node PUBLIC 
-    CONFIG_FILE="./nodeconfig.json"
+    CONFIG_FILE=ConfigFilePath
     USE_THREADING_IN_REQUESTS=UseThreadingInRequests
     USE_THREAD_POOL_FOR_REQUESTER=UseThreadPoolForRequester
     USE_THREAD_POOL_FOR_INIT=UseThreadPoolForInit
     ENABLE_REGEX_IN_POST_REQUESTS=EnableRegexInPostRequests
+# For each mass request, init x number of tasks
     REQUESTER_LOOPS=1
 )
 
-set (FETCHCONTENT_UPDATES_DISCONNECTED ON)
+set(FETCHCONTENT_UPDATES_DISCONNECTED ON)
 
 include(FetchContent)
 
@@ -84,6 +86,10 @@ if (NOT ${tpgit_POPULATED})
 endif()
 
 target_include_directories(node PUBLIC "${tpgit_SOURCE_DIR}/include")
+
+target_compile_definitions(node PUBLIC
+
+)
 
 message(STATUS "Finished")
 

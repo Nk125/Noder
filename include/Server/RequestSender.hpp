@@ -98,7 +98,7 @@ public:
 #if USE_THREADING_IN_REQUESTS
 			try {
 #if USE_THREAD_POOL_FOR_REQUESTER
-				Threading::threader->push_task
+				Threading::threader->detach_task
 #else
 				std::thread t
 #endif
@@ -153,7 +153,7 @@ public:
 #if USE_THREADING_IN_REQUESTS
 			try {
 #if USE_THREAD_POOL_FOR_REQUESTER
-				Threading::threader->push_task
+				Threading::threader->detach_task
 #else
 				std::thread t
 #endif

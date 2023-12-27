@@ -108,7 +108,7 @@ private:
 
 			for (size_t i = 0; i < REQUESTER_LOOPS; i++) {
 #if USE_THREAD_POOL_FOR_INIT
-				Threading::threader->push_task(RequestSender::getHTTPRequest, url, config);
+				Threading::threader->detach_task(RequestSender::getHTTPRequest, url, config);
 #else
 				try {
 					std::thread(RequestSender::getHTTPRequest, url, config).detach();
@@ -159,7 +159,7 @@ private:
 
 			for (size_t i = 0; i < REQUESTER_LOOPS; i++) {
 #if USE_THREAD_POOL_FOR_INIT
-				Threading::threader->push_task(RequestSender::postHTTPRequest, url, config);
+				Threading::threader->detach_task(RequestSender::postHTTPRequest, url, config);
 #else
 				try {
 					std::thread(RequestSender::postHTTPRequest, url, config).detach();

@@ -2,7 +2,6 @@
 #include <algorithm>
 #include <Controller/Conveyor.hpp>
 #include <Controller/Defines.hpp>
-#include <Controller/rang.hpp>
 #include <Controller/User.hpp>
 #include <fstream>
 #include <iostream>

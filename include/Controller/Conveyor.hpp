@@ -1,5 +1,4 @@
 #pragma once
-#define CPPHTTPLIB_OPENSSL_SUPPORT
 #include <Controller/Defines.hpp>
 #include <Controller/Translator.hpp>
 #include <httplib.h>
