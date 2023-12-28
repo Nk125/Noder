@@ -41,7 +41,7 @@ mkdir "${buildPath}" 1>/dev/null 2>&1
 echo "Configuring"
 cmake -B "${buildPath}" -S "${sourceDir}" -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_FLAGS="-fuse-ld=gold" -G "Ninja" -DCMAKE_MAKE_PROGRAM=ninja
 echo "Building"
-cmake --build "${buildPath}" --target node
+cmake --build "${buildPath}" --target node -j 4
 echo "Built"
 exit $?
 ;;
