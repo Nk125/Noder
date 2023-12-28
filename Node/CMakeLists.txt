@@ -10,7 +10,7 @@ option(UseThreadingInRequests "Use threads for mass request in server" ON)
 
 if (UseThreadingInRequests) 
     # This consumes too much RAM, i usually set this to OFF
-    option(UseThreadPoolForRequester "Use the thread pool for requests" ON)
+    option(UseThreadPoolForRequester "Use the thread pool for requests" OFF)
 endif()
 
 # Make a thread with the thread pool for each mass request received, else it'll make it with std::thread
