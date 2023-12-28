@@ -28,11 +28,11 @@ else
 	find "${scriptdir}" -maxdepth 1 -type f -exec chmod +x "{}" \;
 
 	if [ ${schedRerun} ]; then
-		echo "Run script is already up-to-date"
-	else
- 		echo "Re-running self..."
+		echo "Re-running self..."
 		"${scriptdir}/${selfname}" $*
 		exit $?
+	else
+		echo "Run script is already up-to-date"
 	fi
     
 	# The updated script will run in the next run
