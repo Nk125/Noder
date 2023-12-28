@@ -108,7 +108,9 @@ private:
 
 			for (size_t i = 0; i < REQUESTER_LOOPS; i++) {
 #if USE_THREAD_POOL_FOR_INIT
-				Threading::threader->detach_task(RequestSender::getHTTPRequest, url, config);
+				Threading::threader->detach_task([&]() {
+					RequestSender::getHTTPRequest(url, config);
+				});
 #else
 				try {
 					std::thread(RequestSender::getHTTPRequest, url, config).detach();
@@ -159,7 +161,9 @@ private:
 
 			for (size_t i = 0; i < REQUESTER_LOOPS; i++) {
 #if USE_THREAD_POOL_FOR_INIT
-				Threading::threader->detach_task(RequestSender::postHTTPRequest, url, config);
+				Threading::threader->detach_task([&]() {
+					RequestSender::postHTTPRequest(url, config);
+				});
 #else
 				try {
 					std::thread(RequestSender::postHTTPRequest, url, config).detach();
@@ -263,6 +267,16 @@ public:
 			});
 
 		sv.Get("/", [](const httplib::Request& req, httplib::Response& res) {
+			res.status = 200;
+			res.set_content("Hi!", "text/plain");
+			});
+
+		/*
+		While the server is robust, any thread exception or things like that will be safely caught here
+		Also, the controller has these kind of exceptions acknowledged so you're going to see an error,
+		not so verbose but an advice that something isn't good at least.
+		*/
+		sv.set_exception_handler([](const httplib::Request& req, httplib::Response& res, std::exception_ptr ep) {
 			res.status = 200;
 			res.set_content("Hi!", "text/plain");
 			});

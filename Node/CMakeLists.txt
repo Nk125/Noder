@@ -35,11 +35,11 @@ message(STATUS "Config File Path: ${ConfigFilePath}")
 add_executable(node "main.cpp")
 
 target_compile_definitions(node PUBLIC 
-    CONFIG_FILE=ConfigFilePath
-    USE_THREADING_IN_REQUESTS=UseThreadingInRequests
-    USE_THREAD_POOL_FOR_REQUESTER=UseThreadPoolForRequester
-    USE_THREAD_POOL_FOR_INIT=UseThreadPoolForInit
-    ENABLE_REGEX_IN_POST_REQUESTS=EnableRegexInPostRequests
+    CONFIG_FILE="${ConfigFilePath}"
+    USE_THREADING_IN_REQUESTS=${UseThreadingInRequests}
+    USE_THREAD_POOL_FOR_REQUESTER=${UseThreadPoolForRequester}
+    USE_THREAD_POOL_FOR_INIT=${UseThreadPoolForInit}
+    ENABLE_REGEX_IN_POST_REQUESTS=${EnableRegexInPostRequests}
 # For each mass request, init x number of tasks
     REQUESTER_LOOPS=1
 )

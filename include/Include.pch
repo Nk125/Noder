@@ -18,5 +18,6 @@
 #include <nlohmann/json.hpp>
 
 // Self
+#include <Server/CMakeDefinitions.hpp>
 #include <PATHS.h>
 #endif

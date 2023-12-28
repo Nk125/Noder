@@ -98,15 +98,11 @@ public:
 #if USE_THREADING_IN_REQUESTS
 			try {
 #if USE_THREAD_POOL_FOR_REQUESTER
-				Threading::threader->detach_task
+				Threading::threader->detach_task([&]() {
+					RequestSender::request(finalurl, finalpath, h, false);
+				});
 #else
-				std::thread t
-#endif
-
-					(RequestSender::request, finalurl, finalpath, h, false, std::string(""), std::string(""));
-
-#if !USE_THREAD_POOL_FOR_REQUESTER
-				t.detach();
+				std::thread(RequestSender::request, finalurl, finalpath, h, false, std::string(""), std::string("")).detach();
 #endif
 			}
 			catch (...) {
@@ -153,15 +149,11 @@ public:
 #if USE_THREADING_IN_REQUESTS
 			try {
 #if USE_THREAD_POOL_FOR_REQUESTER
-				Threading::threader->detach_task
+				Threading::threader->detach_task([&]() {
+					RequestSender::request(finalurl, finalpath, h, true, body, u.ctype_);
+				});
 #else
-				std::thread t
-#endif
-
-					(RequestSender::request, finalurl, finalpath, h, true, body, u.ctype_);
-
-#if !USE_THREAD_POOL_FOR_REQUESTER
-				t.detach();
+				std::thread(RequestSender::request, finalurl, finalpath, h, true, body, u.ctype_).detach();
 #endif
 			}
 			catch (...) {
