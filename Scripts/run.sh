@@ -36,6 +36,10 @@ else
 	# The updated script will run in the next run
 fi
 mkdir "${buildPath}" 1>/dev/null 2>&1
+if [ -d "${buildPath}" ]; then
+	echo "Clearing CMake Cache"
+	cmake --build "${buildPath}" --target clean
+fi
 echo "Configuring"
 cmake -B "${buildPath}" -S "${sourceDir}" -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_FLAGS="-fuse-ld=gold" -G "Ninja"
 echo "Building"
