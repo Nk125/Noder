@@ -2,11 +2,13 @@ cmake_minimum_required(VERSION 3.19)
 
 project(node)
 
+set(HTTPLIB_USE_ZLIB_IF_AVAILABLE false)
+
 find_package(OpenSSL REQUIRED)
 
 option(UseThreadingInRequests "Use threads for mass request in server" ON)
 
-if (UseThreadingInRequests) 
+if (${UseThreadingInRequests}) 
     # This consumes too much RAM, i usually set this to OFF
     option(UseThreadPoolForRequester "Use the thread pool for requests" OFF)
 endif()
