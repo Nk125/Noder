@@ -25,6 +25,10 @@ public:
     Conveyor(std::string url, std::string token = "") {
         http = std::make_shared<httplib::Client>(url);
         http->set_keep_alive(true);
+        http->set_connection_timeout(35, 0);
+        http->set_read_timeout(35, 0);
+        http->set_write_timeout(35, 0);
+
 
         if (!token.empty()) AddToken(token);
     }
