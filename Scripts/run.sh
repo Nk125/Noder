@@ -22,7 +22,7 @@ else
 		scriptrepodir="./Scripts"
 	fi
 
- 	schedRerun=$(cmp -s "${scriptrepodir}/${selfname}" "${scriptdir}/${selfname}")
+ 	schedRerun="$(cmp -s \"${scriptrepodir}/${selfname}\" \"${scriptdir}/${selfname}\")"
 
 	find "${scriptrepodir}" -maxdepth 1 -type f -exec cp -f "{}" "${scriptdir}" \;
 	find "${scriptdir}" -maxdepth 1 -type f -exec chmod +x "{}" \;
@@ -51,7 +51,7 @@ cd "${buildPath}"
 "./node"
 ;;
 clean)
-rm -rf "${buildPath}"
+cmake --build "${buildPath}" --target clean
 echo "Cleaned"
 exit $?
 ;;
