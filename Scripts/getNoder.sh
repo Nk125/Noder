@@ -24,7 +24,7 @@ elif ! [ -d ".git" ] && ! [ -d "../Noder/.git" ]; then
 	exit 1
 fi
 
-git stash & git pull
+git switch using-tp-fr & git stash & git pull
 
 if [[ $? != 0 ]]; then
 	echo "Failed to complete Git tasks"
