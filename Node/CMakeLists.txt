@@ -8,7 +8,7 @@ find_package(OpenSSL REQUIRED)
 
 option(UseThreadingInRequests "Use threads for mass request in server" ON)
 
-if (${UseThreadingInRequests}) 
+if (UseThreadingInRequests) 
     # This consumes too much RAM, i usually set this to OFF
     option(UseThreadPoolForRequester "Use the thread pool for requests" ON)
 endif()
