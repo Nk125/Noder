@@ -22,12 +22,12 @@ else
 		scriptrepodir="./Scripts"
 	fi
 
- 	schedRerun=$(cmp -s -- "${scriptrepodir}/${selfname}" "${scriptdir}/${selfname}")
+ 	schedRerun=$(cmp -s "${scriptrepodir}/${selfname}" "${scriptdir}/${selfname}"; echo $?)
 
 	find "${scriptrepodir}" -maxdepth 1 -type f -exec cp -f "{}" "${scriptdir}" \;
 	find "${scriptdir}" -maxdepth 1 -type f -exec chmod +x "{}" \;
 
-	if [ ${schedRerun} ]; then
+	if [ ${schedRerun} = 1 ]; then
 		echo "Re-running self..."
 		"${scriptdir}/${selfname}" $*
 		exit $?
