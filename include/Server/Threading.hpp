@@ -1,13 +1,15 @@
 #pragma once
 #include <Include.pch>
 
-// Moved from Precompiled Header due to thread_info_index/_pool that didn't possible compiling
-#include <BS_thread_pool.hpp>
-
-namespace Threading {
-	std::atomic<unsigned long long int> id = 0;
+class Threading : public httplib::TaskQueue {
+public:
+	static std::atomic<unsigned long long> id;
 
 	typedef BS::thread_pool TP;
 
-	std::shared_ptr<TP> threader;
-}
+	static std::shared_ptr<TP> threader;
+
+	virtual bool enqueue(std::function<void()>) override;
+
+	virtual void shutdown() override;
+};

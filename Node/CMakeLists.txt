@@ -6,12 +6,8 @@ set(HTTPLIB_USE_ZLIB_IF_AVAILABLE false)
 
 find_package(OpenSSL REQUIRED)
 
-option(UseThreadingInRequests "Use threads for mass request in server" ON)
-
-if (${UseThreadingInRequests}) 
-    # This consumes too much RAM, i usually set this to OFF
-    option(UseThreadPoolForRequester "Use the thread pool for requests" OFF)
-endif()
+# Every request made by the mass request should be made using async (ON) or direct non-async blocking call (OFF)?
+option(SpawnAsyncHttpClient "Use the thread pool for requests" ON)
 
 # Make a thread with the thread pool for each mass request received, else it'll make it with std::thread
 option(UseThreadPoolForInit "Submit a task to the TP for each mass request" ON)
@@ -20,33 +16,37 @@ option(UseThreadPoolForInit "Submit a task to the TP for each mass request" ON)
 # but regex itself waste too much resources, defaultly set as OFF
 option(EnableRegexInPostRequests "Enable regex in POST Requests" OFF)
 
+# This have a big overhead, i recommend set it to OFF
+# Also doesn't work with more than 1 mass requester
+option(ShowRPS "Show Requests Per Second in node" OFF)
+
 set(ConfigFilePath "./nodeconfig.json")
 
 message(STATUS "Configuration:")
 
-message(STATUS "Use Threading in Requests: ${UseThreadingInRequests}")
+message(STATUS "Spawn Async Client: ${SpawnAsyncHttpClient}")
 
-message(STATUS "Use thread pool For Requester: ${UseThreadPoolForRequester}")
-
-message(STATUS "Use thread pool for init: ${UseThreadPoolForInit}")
+message(STATUS "Use Thread Pool for Init: ${UseThreadPoolForInit}")
 
 message(STATUS "Enable Regex in Post Requests: ${EnableRegexInPostRequests}")
 
+message(STATUS "Show Requests Per Second?: ${ShowRPS}")
+
 message(STATUS "Config File Path: ${ConfigFilePath}")
 
-add_executable(node "main.cpp")
+add_executable(node "main.cpp" "RequestHandler.cpp" "RequestSender.cpp" "Threading.cpp")
 
 target_compile_definitions(node PUBLIC 
     CONFIG_FILE="${ConfigFilePath}"
-    USE_THREADING_IN_REQUESTS=${UseThreadingInRequests}
-    USE_THREAD_POOL_FOR_REQUESTER=${UseThreadPoolForRequester}
+    ASYNC_REQUEST_SEND=${SpawnAsyncHttpClient}
     USE_THREAD_POOL_FOR_INIT=${UseThreadPoolForInit}
     ENABLE_REGEX_IN_POST_REQUESTS=${EnableRegexInPostRequests}
-# For each mass request, init x number of tasks
-    REQUESTER_LOOPS=1
+    SHOW_RPS=${ShowRPS}
+# For each mass request, init x number of clients/connections
+    CONNECTIONS=1
 )
 
-set(FETCHCONTENT_UPDATES_DISCONNECTED ON)
+set(FETCHCONTENT_UPDATES_DISCONNECTED OFF)
 
 include(FetchContent)
 

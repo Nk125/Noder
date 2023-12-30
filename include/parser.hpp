@@ -13,7 +13,7 @@ public:
     std::string protocol_, host_, path_, query_, ctype_, body_;
 
 private:
-    void parse(const std::string &url_s);
+    inline void parse(const std::string &url_s);
 };
 // ctors, copy, equality, ...
 

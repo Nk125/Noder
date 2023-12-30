@@ -1,14 +1,12 @@
 #pragma once
-#include <Include.pch>
 
 namespace Configuration {
-    nlohmann::json config;
+	static nlohmann::json config ({
+	    {"token", "default"},
+	    {"port", 80}
+    });
 
-    void loadConfig() {
-        nlohmann::json defaultConfig {
-            {"token", "default"}
-        };
-
+    static void loadConfig() {
 	    try {
 			std::ifstream f(CONFIG_FILE);
 
@@ -23,7 +21,6 @@ namespace Configuration {
 	    }
 	    catch (...) {
 		    std::cerr << "Failed loading config, using default values\n";
-            config = defaultConfig;
 		    return;
 	    }
     }

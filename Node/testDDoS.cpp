@@ -31,18 +31,22 @@ int main(int argc, char* argv[]) {
     std::mutex m;
 
     sv.set_logger([&](const httplib::Request& req, const httplib::Response& res) {
-        m.lock();
+        std::lock_guard<std::mutex> lock(m);
+        
         std::cout << "\rRequest #" << (++requests.try_emplace({req.method, 0}).first->second);
-        m.unlock();
     });
 
     sv.Get("/", [&](const httplib::Request& req, httplib::Response& res) {
+        std::lock_guard<std::mutex> lock(m);
+
         res.status = 200;
         res.set_content("Your request is the #" + std::to_string(requests["GET"]) +
         " (Global: " + std::to_string(requests["GET"] + requests["POST"]) + ")", "text/plain");
     });
 
     sv.Post("/", [&](const httplib::Request& req, httplib::Response& res) {
+        std::lock_guard<std::mutex> lock(m);
+
         res.status = 200;
         res.set_content("Your request is the #" + std::to_string(requests["POST"]) +
         " (Global: " + std::to_string(requests["GET"] + requests["POST"]) + ")", "text/plain");
