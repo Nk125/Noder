@@ -5,9 +5,6 @@
 #include <Server/RequestHandler.hpp>
 #include <Server/Threading.hpp>
 
-
-// To compile:
-
 // clear && clang++ -O1 -pthread -lssl -lcrypto -std=c++17 -o ./main main.cpp &&
 // ./main
 
@@ -52,10 +49,14 @@ int main() {
 
 	while (true) {
 		try {
-			start(Configuration::config["port"]);
+			start(Configuration::config["port"].template get<unsigned short>());
+		}
+		catch (nlohmann::json::exception &e) {
+			std::cerr << "Invalid config: " << e.what() << "\n";
+			break;
 		}
 		catch (std::exception &e) {
-			std::cerr << e.what() << "\n";
+			std::cerr << "Caught error: " << e.what() << "\n";
 		}
 		catch (...) {
 			std::cerr << "Unhandled error in start()\n";

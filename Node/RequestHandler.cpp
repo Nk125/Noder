@@ -26,9 +26,8 @@ void RequestHandler::genericResponse(httplib::Response &res, std::string descrip
     return;
 }
 
-bool RequestHandler::checkAuthorization(const httplib::Request &req, httplib::Response &res)
-{
-    if (req.get_header_value("Token") == Configuration::config["token"]) {
+bool RequestHandler::checkAuthorization(const httplib::Request &req, httplib::Response &res) {
+    if (req.get_header_value("Token") == Configuration::config["token"].template get<std::string>()) {
         return true;
     }
 
